@@ -78,7 +78,7 @@ public class Main extends Application {
         enemies.forEach(GameObject::update);
 
         player.update();
-        if(player.isAccelerating()==true){
+        if(player.isAccelerating()){
             if(gravityFactor>1)     gravityFactor-=0.07;
             else    gravityFactor = 1;
 
@@ -114,7 +114,7 @@ public class Main extends Application {
                     System.out.println("5");
                 }
             }
-        } else if(player.isAccelerating()==false){
+        } else if(player.isAccelerating()){
             if(gravityFactor<5)     gravityFactor+=0.07;
             else    gravityFactor = 5;
 
@@ -133,7 +133,7 @@ public class Main extends Application {
         }   else if(player.isTurningRight()){
             player.rotateRight();
         }
-        if(player.isShooting()==true){
+        if(player.isShooting()){
             shot();
         }
 
