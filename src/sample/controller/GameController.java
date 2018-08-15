@@ -125,21 +125,11 @@ public class GameController {
     }
 
     private void playerInterialMovementService() {
-        //początek ruchu bezwładnościowego
-        int i = 0;
-        for (Point2D vector : player.getMultipleMotions()) {
-            if (Math.abs(vector.getX()) >= 0.04 || Math.abs(vector.getY()) >= 0.04) {
-                player.updatePosition(vector);
-                Point2D newVector = new Point2D(vector.getX() * 0.98, vector.getY() * 0.98);
-                player.getMultipleMotions().set(i, newVector);
-//                System.out.println("nowy: " + player.getMultipleMotions().get(i));
-            } else {
-                Point2D newVector = new Point2D(0, 0);
-                player.getMultipleMotions().set(i, newVector);
-            }
-            i++;
-        }
-//koniec bezwładności
+        player.setMultipleMotions(player.getMultipleMotions().stream()
+                .filter(vector -> Math.abs(vector.getX()) >= 0.04 || Math.abs(vector.getY()) >= 0.04)
+                .map(vector-> new Point2D(vector.getX() * 0.98, vector.getY() * 0.98))
+                .collect(Collectors.toList()));
+        player.getMultipleMotions().forEach(player::updatePosition);
     }
 
     public GameObject fireBullet() {
