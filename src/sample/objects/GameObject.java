@@ -18,6 +18,16 @@ public class GameObject {
     private boolean isShooting = false;
     private List<Point2D> multipleMotions = new ArrayList<>();
 
+    public double getGravityFactor() {
+        return gravityFactor;
+    }
+
+    public void setGravityFactor(double gravityFactor) {
+        this.gravityFactor = gravityFactor;
+    }
+
+    private double gravityFactor = 1;
+
     GameObject(Node view) {
         this.view = view;
     }

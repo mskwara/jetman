@@ -17,7 +17,7 @@ public class GameController {
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
     private GameObject player;
-    private double gravityFactor = 1;
+
 
     public GameController() {
         player = new Player();
@@ -66,10 +66,10 @@ public class GameController {
     private void updatePlayer() {
         player.update();
         if (player.isAccelerating()) {
-            if (gravityFactor > 1) {
-                gravityFactor -= 0.07;
+            if (player.getGravityFactor() > 1) {
+                player.setGravityFactor(player.getGravityFactor() - 0.07);
             } else {
-                gravityFactor = 1;
+                player.setGravityFactor(1);
             }
 
             if ((player.getVelocity().getX() == 0 && player.getVelocity().getY() == 0)) { //statek nie porusza sie
@@ -99,11 +99,11 @@ public class GameController {
                     System.out.println("5");
                 }
             }
-        } else if (player.isAccelerating()) {
-            if (gravityFactor < 5) {
-                gravityFactor += 0.07;
+        } else if (player.isAccelerating()==false) {
+            if (player.getGravityFactor() < 5) {
+                player.setGravityFactor(player.getGravityFactor() + 0.07);
             } else {
-                gravityFactor = 5;
+                player.setGravityFactor(5);
             }
 
             /*if(player.getSpeed()>=0.04) {
@@ -158,7 +158,14 @@ public class GameController {
     }
 
     public void updateGravity() {
-        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * gravityFactor);
-        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * gravityFactor));
+        for(GameObject enemy : enemies) {
+            if (enemy.getGravityFactor() < 5) {
+                enemy.setGravityFactor(enemy.getGravityFactor() + 0.07);
+            } else {
+                enemy.setGravityFactor(5);
+            }
+        }
+        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
+        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * enemy.getGravityFactor()));
     }
 }
