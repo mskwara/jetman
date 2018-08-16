@@ -88,9 +88,9 @@ public class Main extends Application {
     }
 
     private void onUpdate() {
-
-        if(gameController.getBullets().size() != 0) {
-            for (GameObject bullet : gameController.getBullets()) {
+        System.out.println(gameController.getPlayer().getBullets().size());
+        if(gameController.getPlayer().getBullets().size() != 0) {
+            for (GameObject bullet : gameController.getPlayer().getBullets()) {
                 g.setGlobalAlpha(1.0);
                 g.setGlobalBlendMode(BlendMode.SRC_OVER);
                 g.setFill(Color.BLACK);
