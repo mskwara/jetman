@@ -5,6 +5,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static sample.objects.Gun.BULLET_SPEED_FACTOR;
 
@@ -42,5 +43,13 @@ public class Player extends GameObject {
             }
         }
         return firedBullets;
+    }
+
+    public void moveInterial(){
+        setMultipleMotions(getMultipleMotions().stream()
+                .filter(vector -> Math.abs(vector.getX()) >= 0.04 || Math.abs(vector.getY()) >= 0.04)
+                .map(vector -> vector.multiply(0.98))
+                .collect(Collectors.toList()));
+        getMultipleMotions().forEach(this::updatePosition);
     }
 }
