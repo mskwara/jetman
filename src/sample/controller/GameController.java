@@ -99,7 +99,7 @@ public class GameController {
                     System.out.println("5");
                 }
             }
-        } else if (player.isAccelerating()==false) {
+        } else if (!player.isAccelerating()) {
             if (player.getGravityFactor() < 5) {
                 player.setGravityFactor(player.getGravityFactor() + 0.07);
             } else {
@@ -147,12 +147,12 @@ public class GameController {
         if (player.getVelocity().getX() != 0 && player.getVelocity().getY() != 0) { //jeśli statek się porusza
             if (player.getVelocity().getX() != Math.cos(Math.toRadians(player.getRotate())) || player.getVelocity().getY() != Math.sin(Math.toRadians(player.getRotate()))) {
                 bullet.setVelocity(new Point2D(Math.cos(Math.toRadians(player.getRotate())),
-                        Math.sin(Math.toRadians(player.getRotate()))).normalize().multiply(15)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
+                        Math.sin(Math.toRadians(player.getRotate()))).normalize().multiply(10)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
             } else {
-                bullet.setVelocity(player.getVelocity().normalize().multiply(15));
+                bullet.setVelocity(player.getVelocity().normalize().multiply(10));
             }
         } else {
-            bullet.setVelocity(new Point2D(Math.cos(Math.toRadians(player.getRotate())), Math.sin(Math.toRadians(player.getRotate()))).normalize().multiply(15));
+            bullet.setVelocity(new Point2D(Math.cos(Math.toRadians(player.getRotate())), Math.sin(Math.toRadians(player.getRotate()))).normalize().multiply(10));
         }
         return bullet;
     }
@@ -165,7 +165,15 @@ public class GameController {
                 enemy.setGravityFactor(5);
             }
         }
+        for(GameObject bullet : bullets) {
+            if (bullet.getGravityFactor() < 15) {
+                bullet.setGravityFactor(bullet.getGravityFactor() + 0.07);
+            } else {
+                bullet.setGravityFactor(15);
+            }
+        }
         player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
         enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * enemy.getGravityFactor()));
+        bullets.forEach(bullet -> bullet.getView().setTranslateY(bullet.getView().getTranslateY() + GRAVITY * bullet.getGravityFactor()));
     }
 }
