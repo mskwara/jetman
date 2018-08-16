@@ -17,6 +17,21 @@ public class GameObject {
     private boolean isAccelerating = false;
     private boolean isShooting = false;
     private List<Point2D> multipleMotions = new ArrayList<>();
+    private double gravityFactor = 1;
+    private double maxGravityFactor = 10;
+
+
+    GameObject(Node view) {
+        this.view = view;
+    }
+
+    public double getMaxGravityFactor() {
+        return maxGravityFactor;
+    }
+
+    public void setMaxGravityFactor(double maxGravityFactor) {
+        this.maxGravityFactor = maxGravityFactor;
+    }
 
     public double getGravityFactor() {
         return gravityFactor;
@@ -26,10 +41,8 @@ public class GameObject {
         this.gravityFactor = gravityFactor;
     }
 
-    private double gravityFactor = 1;
-
-    GameObject(Node view) {
-        this.view = view;
+    public void changeGravityFactor(double diff){
+        this.gravityFactor += diff;
     }
 
     public List<Point2D> getMultipleMotions() {
@@ -157,7 +170,22 @@ public class GameObject {
         return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
     }
 
-    public boolean isMoving(){
+    public boolean hasSpeed(){
+        return speed !=0;
+    }
+
+    public boolean hasVelocity(){
         return velocity.getX() != 0 || velocity.getY() != 0;
     }
+
+    public double cosRotation(){
+        return Math.cos(Math.toRadians(getRotate()));
+    }
+    public double sinRotation(){
+        return Math.sin(Math.toRadians(getRotate()));
+    }
+    public Point2D createVector(){
+        return new Point2D(cosRotation(),sinRotation());
+    }
+
 }

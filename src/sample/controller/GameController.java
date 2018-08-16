@@ -1,18 +1,18 @@
 package sample.controller;
 
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import sample.objects.Bullet;
 import sample.objects.GameObject;
+import sample.objects.Gravity;
 import sample.objects.Player;
 import sample.utils.Helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sample.objects.Player.PLAYER_SPEED_FACTOR;
 public class GameController {
-
     private static final double GRAVITY = 1;
     private static final int BULLET_SPEED_FACTOR = 10;
     private static final double GAME_OBJECT_SPEED_FACTOR = 1.07;
@@ -28,16 +28,15 @@ public class GameController {
         this.bullets = bullets;
     }
 
+
+
+
     public GameController() {
         player = new Player();
     }
 
-    public GameObject getPlayer() {
+    public Player getPlayer() {
         return player;
-    }
-
-    public void addBullet(GameObject bullet) {
-        bullets.add(bullet);
     }
 
     public void addEnemy(GameObject enemy) {
@@ -47,7 +46,7 @@ public class GameController {
 
     public List<Node> gameObjectsToRemoveList() {
         List<Node> list = new ArrayList<>();
-        for (GameObject bullet : bullets) {
+        for (GameObject bullet : player.getBullets()) {
             for (GameObject enemy : enemies) {
                 if (enemy.getView().getTranslateY() > 900 || enemy.getView().getTranslateX() > 900) {
                     enemy.setAlive(false);
@@ -64,14 +63,14 @@ public class GameController {
                 }
             }
         }
-        bullets.removeIf(GameObject::isDead);
+        player.getBullets().removeIf(GameObject::isDead);
         enemies.removeIf(GameObject::isDead);
 
         return list;
     }
 
     public void updateGameObjects() {
-        bullets.forEach(GameObject::update);
+        player.getBullets().forEach(GameObject::update);
         enemies.forEach(GameObject::update);
         updatePlayer();
         //updateEnemies();
@@ -80,41 +79,27 @@ public class GameController {
     private void updatePlayer() {
         player.update();
         if (player.isAccelerating()) {
-            if (player.getGravityFactor() > 1) {
-                player.setGravityFactor(player.getGravityFactor() - 0.07);
-            } else {
-                player.setGravityFactor(1);
-            }
-
-            if (!player.isMoving()) {
-                player.setVelocity(createVector(player));
+            if (!player.hasVelocity()) {
+                player.setVelocity(player.createVector());
                 player.setSpeed(1);
 //                System.out.println("1");
             } else {
                 if (hasNotMaxSpeed(player)) {
-                    if (Helper.round(player.getVelocity().getX()) != Helper.round(cosRotation(player) * player.getSpeed())
-                            || Helper.round(player.getVelocity().getY()) != Helper.round(sinRotation(player) * player.getSpeed())) {
+                    if (Helper.round(player.getVelocity().getX()) != Helper.round(player.cosRotation() * player.getSpeed())
+                            || Helper.round(player.getVelocity().getY()) != Helper.round(player.sinRotation() * player.getSpeed())) {
                     //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
-                        player.setVelocity(createVector(player).normalize().multiply(player.getSpeed()));
+                        player.setVelocity(player.createVector().normalize().multiply(player.getSpeed()));
 //                        System.out.println("2\n" + player.getVelocity().getX() + "\n" + cosRotation(player) * player.getSpeed());
                     } else {
-                        player.setVelocity(player.getVelocity().multiply(GAME_OBJECT_SPEED_FACTOR));
-                        player.setSpeed(player.getSpeed() * GAME_OBJECT_SPEED_FACTOR);
+                        player.setVelocity(player.getVelocity().multiply(PLAYER_SPEED_FACTOR));
+                        player.setSpeed(player.getSpeed() * PLAYER_SPEED_FACTOR);
 //                        System.out.println("3");
                     }
                 } else if (player.getSpeed() < 1) {
-                    player.setVelocity(createVector(player));
+                    player.setVelocity(player.createVector());
                     player.setSpeed(1);
 //                    System.out.println("4");
                 }
-            }
-        } else if (!player.isAccelerating()) {
-
-            if (player.getGravityFactor() < 5) {
-                player.setGravityFactor(player.getGravityFactor() + 0.07);
-
-            } else {
-                player.setGravityFactor(5);
             }
         }
 
@@ -125,26 +110,9 @@ public class GameController {
         }
         playerInterialMovementService();
     }
-    /*private void updateEnemies(){
-        if (gravityFactorEnemy < 5) {
-            gravityFactorEnemy += 0.07;
-        } else {
-            gravityFactorEnemy = 5;
-        }
-    }*/
 
     private boolean hasNotMaxSpeed(GameObject object){
         return object.getSpeed() <= 9 && object.getSpeed() >= 1;
-    }
-
-    private double cosRotation(GameObject object){
-        return Math.cos(Math.toRadians(object.getRotate()));
-    }
-    private double sinRotation(GameObject object){
-        return Math.sin(Math.toRadians(object.getRotate()));
-    }
-    private Point2D createVector(GameObject object){
-        return new Point2D(cosRotation(object),sinRotation(object));
     }
 
     private void playerInterialMovementService() {
@@ -155,41 +123,10 @@ public class GameController {
         player.getMultipleMotions().forEach(player::updatePosition);
     }
 
-    public GameObject fireBullet() {
-        Bullet bullet = new Bullet();
-
-        if (player.isMoving()) { //jeśli statek się porusza
-            if (player.getVelocity().getX() != cosRotation(player) || player.getVelocity().getY() != sinRotation(player)) {
-                bullet.setVelocity(createVector(player).normalize().multiply(BULLET_SPEED_FACTOR)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
-            } else {
-                bullet.setVelocity(player.getVelocity().normalize().multiply(BULLET_SPEED_FACTOR));
-            }
-        } else {
-            bullet.setVelocity(createVector(player).normalize().multiply(BULLET_SPEED_FACTOR));
-
-        }
-        return bullet;
-    }
 
     public void updateGravity() {
-
-        for(GameObject enemy : enemies) {
-            if (enemy.getGravityFactor() < 5) {
-                enemy.setGravityFactor(enemy.getGravityFactor() + 0.07);
-            } else {
-                enemy.setGravityFactor(5);
-            }
-        }
-        for(GameObject bullet : bullets) {
-            if (bullet.getGravityFactor() < 15) {
-                bullet.setGravityFactor(bullet.getGravityFactor() + 0.07);
-            } else {
-                bullet.setGravityFactor(15);
-            }
-        }
-        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
-        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * enemy.getGravityFactor()));
-        bullets.forEach(bullet -> bullet.getView().setTranslateY(bullet.getView().getTranslateY() + GRAVITY * bullet.getGravityFactor()));
-
+        Gravity.updateGameObjectsGravity(player.getBullets());
+        Gravity.updateGameObjectsGravity(enemies);
+        Gravity.updatePlayersGravity(Collections.singletonList(player));
     }
 }
