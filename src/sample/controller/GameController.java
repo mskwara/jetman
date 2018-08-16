@@ -91,21 +91,12 @@ public class GameController {
         } else if (player.isTurningRight()) {
             player.rotateRight();
         }
-        playerInterialMovementService();
+        player.moveInterial();
     }
 
     private boolean hasNotMaxSpeed(GameObject object){
         return object.getSpeed() <= 9 && object.getSpeed() >= 1;
     }
-
-    private void playerInterialMovementService() {
-        player.setMultipleMotions(player.getMultipleMotions().stream()
-                .filter(vector -> Math.abs(vector.getX()) >= 0.04 || Math.abs(vector.getY()) >= 0.04)
-                .map(vector -> vector.multiply(0.98))
-                .collect(Collectors.toList()));
-        player.getMultipleMotions().forEach(player::updatePosition);
-    }
-
 
     public void updateGravity() {
         Gravity.updateGameObjectsGravity(player.getBullets());
