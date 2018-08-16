@@ -10,11 +10,13 @@ import static sample.objects.Gun.BULLET_SPEED_FACTOR;
 
 public class Player extends GameObject {
     public static final double PLAYER_SPEED_FACTOR = 1.07;
+    private static final double MAX_GRAVITY_FACTOR = 5;
     private Weapon weapon;
     private List<GameObject> bullets = new ArrayList<>();
 
     public Player() {
         super(new Rectangle(40, 20, Color.BLUE));
+        setMaxGravityFactor(MAX_GRAVITY_FACTOR);
         weapon = new Gun();
     }
 

@@ -2,10 +2,12 @@ package sample.controller;
 
 import javafx.scene.Node;
 import sample.objects.GameObject;
+import sample.objects.Gravity;
 import sample.objects.Player;
 import sample.utils.Helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,12 +15,8 @@ import static sample.objects.Player.PLAYER_SPEED_FACTOR;
 
 public class GameController {
 
-    private static final double GRAVITY = 1;
-
     private List<GameObject> enemies = new ArrayList<>();
     private Player player;
-
-
 
     public GameController() {
         player = new Player();
@@ -64,12 +62,6 @@ public class GameController {
     private void updatePlayer() {
         player.update();
         if (player.isAccelerating()) {
-            if (player.getGravityFactor() > 1) {
-                player.setGravityFactor(player.getGravityFactor() - 0.07);
-            } else {
-                player.setGravityFactor(1);
-            }
-
             if (!player.hasVelocity()) {
                 player.setVelocity(player.createVector());
                 player.setSpeed(1);
@@ -91,14 +83,6 @@ public class GameController {
                     player.setSpeed(1);
 //                    System.out.println("4");
                 }
-            }
-        } else if (!player.isAccelerating()) {
-
-            if (player.getGravityFactor() < 5) {
-                player.setGravityFactor(player.getGravityFactor() + 0.07);
-
-            } else {
-                player.setGravityFactor(5);
             }
         }
 
@@ -124,24 +108,8 @@ public class GameController {
 
 
     public void updateGravity() {
-
-        for(GameObject enemy : enemies) {
-            if (enemy.getGravityFactor() < 5) {
-                enemy.setGravityFactor(enemy.getGravityFactor() + 0.07);
-            } else {
-                enemy.setGravityFactor(5);
-            }
-        }
-        for(GameObject bullet : player.getBullets()) {
-            if (bullet.getGravityFactor() < 15) {
-                bullet.setGravityFactor(bullet.getGravityFactor() + 0.07);
-            } else {
-                bullet.setGravityFactor(15);
-            }
-        }
-        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
-        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * enemy.getGravityFactor()));
-        player.getBullets().forEach(bullet -> bullet.getView().setTranslateY(bullet.getView().getTranslateY() + GRAVITY * bullet.getGravityFactor()));
-
+        Gravity.updateGameObjectsGravity(player.getBullets());
+        Gravity.updateGameObjectsGravity(enemies);
+        Gravity.updatePlayersGravity(Collections.singletonList(player));
     }
 }

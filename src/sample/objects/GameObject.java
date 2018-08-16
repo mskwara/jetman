@@ -18,7 +18,20 @@ public class GameObject {
     private boolean isShooting = false;
     private List<Point2D> multipleMotions = new ArrayList<>();
     private double gravityFactor = 1;
+    private double maxGravityFactor = 10;
 
+
+    GameObject(Node view) {
+        this.view = view;
+    }
+
+    public double getMaxGravityFactor() {
+        return maxGravityFactor;
+    }
+
+    public void setMaxGravityFactor(double maxGravityFactor) {
+        this.maxGravityFactor = maxGravityFactor;
+    }
 
     public double getGravityFactor() {
         return gravityFactor;
@@ -28,10 +41,8 @@ public class GameObject {
         this.gravityFactor = gravityFactor;
     }
 
-
-
-    GameObject(Node view) {
-        this.view = view;
+    public void changeGravityFactor(double diff){
+        this.gravityFactor += diff;
     }
 
     public List<Point2D> getMultipleMotions() {
