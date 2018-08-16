@@ -136,4 +136,8 @@ public class GameObject {
     public boolean isColliding(GameObject other) {
         return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
     }
+
+    public boolean isMoving(){
+        return velocity.getX() != 0 || velocity.getY() != 0;
+    }
 }

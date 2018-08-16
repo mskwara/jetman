@@ -57,6 +57,7 @@ public class Main extends Application {
         gameController.updateGameObjects();
         if (gameController.getPlayer().isShooting()) {
             shot();
+            gameController.getPlayer().setShooting(false);
         }
 
         if (Math.random() < 0.02) {
