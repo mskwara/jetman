@@ -10,10 +10,12 @@ import javafx.stage.Stage;
 import sample.controller.GameController;
 import sample.objects.Enemy;
 import sample.objects.GameObject;
+import sample.objects.Player;
+
+import java.util.List;
 
 public class Main extends Application {
-    //hej to kuba
-    //trolololo
+
     private Pane root;
     private GameController gameController;
 
@@ -36,8 +38,12 @@ public class Main extends Application {
     }
 
     private void addBullet(GameObject bullet, double x, double y) {
-        gameController.addBullet(bullet);
+        gameController.getPlayer().addBullet(bullet);
         addGameObject(bullet, x, y);
+    }
+
+    private void addBullets(List<GameObject> bullets, double x, double y){
+        bullets.forEach(bullet -> addBullet(bullet, x, y));
     }
 
     private void addEnemy(GameObject enemy, double x, double y) {
@@ -67,7 +73,7 @@ public class Main extends Application {
     }
 
     private void shot() {
-        addBullet(gameController.fireBullet(), gameController.getPlayer().getView().getTranslateX(), gameController.getPlayer().getView().getTranslateY());
+        addBullets((gameController.getPlayer()).fire(), gameController.getPlayer().getView().getTranslateX(), gameController.getPlayer().getView().getTranslateY());
     }
 
     @Override
