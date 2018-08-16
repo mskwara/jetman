@@ -65,7 +65,7 @@ public class GameController {
         bullets.forEach(GameObject::update);
         enemies.forEach(GameObject::update);
         updatePlayer();
-        updateEnemies();
+        //updateEnemies();
     }
 
     private void updatePlayer() {
@@ -116,13 +116,13 @@ public class GameController {
         }
         playerInterialMovementService();
     }
-    private void updateEnemies(){
+    /*private void updateEnemies(){
         if (gravityFactorEnemy < 5) {
             gravityFactorEnemy += 0.07;
         } else {
             gravityFactorEnemy = 5;
         }
-    }
+    }*/
 
     private boolean hasNotMaxSpeed(GameObject object){
         return object.getSpeed() <= 9 && object.getSpeed() >= 1;
