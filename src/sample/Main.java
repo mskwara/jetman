@@ -12,7 +12,8 @@ import sample.objects.Enemy;
 import sample.objects.GameObject;
 
 public class Main extends Application {
-
+    //hej to kuba
+    //trolololo
     private Pane root;
     private GameController gameController;
 
