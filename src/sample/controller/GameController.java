@@ -16,12 +16,17 @@ public class GameController {
     private static final double GRAVITY = 1;
     private static final int BULLET_SPEED_FACTOR = 10;
     private static final double GAME_OBJECT_SPEED_FACTOR = 1.07;
-
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
     private GameObject player;
 
+    public List<GameObject> getBullets() {
+        return bullets;
+    }
 
+    public void setBullets(List<GameObject> bullets) {
+        this.bullets = bullets;
+    }
 
     public GameController() {
         player = new Player();
@@ -44,8 +49,12 @@ public class GameController {
         List<Node> list = new ArrayList<>();
         for (GameObject bullet : bullets) {
             for (GameObject enemy : enemies) {
-                if (enemy.getView().getTranslateY() > 900) {
+                if (enemy.getView().getTranslateY() > 900 || enemy.getView().getTranslateX() > 900) {
                     enemy.setAlive(false);
+                }
+                if (bullet.getView().getTranslateY() > 900 || bullet.getView().getTranslateX() > 900) {
+                    bullet.setAlive(false);
+
                 }
                 if (bullet.isColliding(enemy)) {
                     bullet.setAlive(false);
