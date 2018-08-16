@@ -18,15 +18,12 @@ public class GameController {
     private static final double GAME_OBJECT_SPEED_FACTOR = 1.07;
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
-    private GameObject player;
+    private Player player;
 
     public List<GameObject> getBullets() {
         return bullets;
     }
 
-    public void setBullets(List<GameObject> bullets) {
-        this.bullets = bullets;
-    }
 
 
 
