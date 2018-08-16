@@ -18,6 +18,16 @@ public class GameObject {
     private boolean isShooting = false;
     private List<Point2D> multipleMotions = new ArrayList<>();
 
+    public double getGravityFactor() {
+        return gravityFactor;
+    }
+
+    public void setGravityFactor(double gravityFactor) {
+        this.gravityFactor = gravityFactor;
+    }
+
+    private double gravityFactor = 1;
+
     GameObject(Node view) {
         this.view = view;
     }
@@ -119,7 +129,12 @@ public class GameObject {
 
     public void rotateRight() {
         //lastRotate = view.getRotate();
-        view.setRotate(view.getRotate() + 3);
+        if(view.getRotate() == 363){
+            view.setRotate(3);
+        }   else {
+            view.setRotate(view.getRotate() + 3);
+        }
+        System.out.println(view.getRotate());
         if (isAccelerating) {
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).normalize().multiply(speed));
         }
@@ -127,7 +142,12 @@ public class GameObject {
 
     public void rotateLeft() {
         //lastRotate = view.getRotate();
-        view.setRotate(view.getRotate() - 3);
+        if(view.getRotate() == -363){
+            view.setRotate(-3);
+        }   else {
+            view.setRotate(view.getRotate() - 3);
+        }
+        System.out.println(view.getRotate());
         if (isAccelerating) {
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).normalize().multiply(speed));
         }

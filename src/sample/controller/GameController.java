@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 public class GameController {
 
     private static final double GRAVITY = 1;
-    private static final int BULLET_SPEED_FACTOR = 15;
+    private static final int BULLET_SPEED_FACTOR = 10;
     private static final double GAME_OBJECT_SPEED_FACTOR = 1.07;
 
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
     private GameObject player;
-    private double gravityFactor = 1;
-    private double gravityFactorEnemy = 1;
+
+
 
     public GameController() {
         player = new Player();
@@ -71,10 +71,10 @@ public class GameController {
     private void updatePlayer() {
         player.update();
         if (player.isAccelerating()) {
-            if (gravityFactor > 1) {
-                gravityFactor -= 0.07;
+            if (player.getGravityFactor() > 1) {
+                player.setGravityFactor(player.getGravityFactor() - 0.07);
             } else {
-                gravityFactor = 1;
+                player.setGravityFactor(1);
             }
 
             if (!player.isMoving()) {
@@ -100,10 +100,12 @@ public class GameController {
                 }
             }
         } else if (!player.isAccelerating()) {
-            if (gravityFactor < 5) {
-                gravityFactor += 0.07;
+
+            if (player.getGravityFactor() < 5) {
+                player.setGravityFactor(player.getGravityFactor() + 0.07);
+
             } else {
-                gravityFactor = 5;
+                player.setGravityFactor(5);
             }
         }
 
@@ -146,6 +148,7 @@ public class GameController {
 
     public GameObject fireBullet() {
         Bullet bullet = new Bullet();
+
         if (player.isMoving()) { //jeśli statek się porusza
             if (player.getVelocity().getX() != cosRotation(player) || player.getVelocity().getY() != sinRotation(player)) {
                 bullet.setVelocity(createVector(player).normalize().multiply(BULLET_SPEED_FACTOR)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
@@ -154,12 +157,30 @@ public class GameController {
             }
         } else {
             bullet.setVelocity(createVector(player).normalize().multiply(BULLET_SPEED_FACTOR));
+
         }
         return bullet;
     }
 
     public void updateGravity() {
-        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * gravityFactor);
-        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * gravityFactorEnemy));
+
+        for(GameObject enemy : enemies) {
+            if (enemy.getGravityFactor() < 5) {
+                enemy.setGravityFactor(enemy.getGravityFactor() + 0.07);
+            } else {
+                enemy.setGravityFactor(5);
+            }
+        }
+        for(GameObject bullet : bullets) {
+            if (bullet.getGravityFactor() < 15) {
+                bullet.setGravityFactor(bullet.getGravityFactor() + 0.07);
+            } else {
+                bullet.setGravityFactor(15);
+            }
+        }
+        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
+        enemies.forEach(enemy -> enemy.getView().setTranslateY(enemy.getView().getTranslateY() + GRAVITY * enemy.getGravityFactor()));
+        bullets.forEach(bullet -> bullet.getView().setTranslateY(bullet.getView().getTranslateY() + GRAVITY * bullet.getGravityFactor()));
+
     }
 }
