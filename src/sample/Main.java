@@ -54,7 +54,8 @@ public class Main extends Application {
         g.fillRect(0, 0, 900, 900);
 
         gameController = new GameController();
-        addGameObject(gameController.getPlayer(), 300, 300);
+        addGameObject(gameController.getPlayer(), 455, 320);
+        gameController.getPlayer().getView().setRotate(-90);
 
         addAirport(gameController.getAirport(), 400, 400);
 

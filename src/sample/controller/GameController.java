@@ -60,7 +60,7 @@ public class GameController {
         System.out.println("currentVel: " + player.getCurrentVelocity());
         if(!player.isAccelerating() && player.isColliding(airport) && (player.getRotate()>=-96 && player.getRotate()<=-84)
                 && player.getCurrentVelocity().getX()<=3  && player.getCurrentVelocity().getY()<=3 && player.getCurrentVelocity().getY()>=0
-                && player.getView().getTranslateY()+20+5 <= airport.getView().getTranslateY()){
+                && player.getView().getTranslateY()+player.getPlayerWidth()/2+airport.getAirportHeight()/2 <= airport.getView().getTranslateY()){
             player.setVelocity(new Point2D(0,0));
             List<Point2D> emptyList = new ArrayList<>();
             player.setMultipleMotions(emptyList);
@@ -73,6 +73,7 @@ public class GameController {
 
     public List<Node> gameObjectsToRemoveList() {
         List<Node> list = new ArrayList<>();
+        //bullet uderza w enemy oraz bullet wypada za mapę
         for (GameObject bullet : player.getBullets()) {
             if (bullet.getView().getTranslateY() > 900 || bullet.getView().getTranslateY() < 0
                     || bullet.getView().getTranslateX() > 900 || bullet.getView().getTranslateX() < 0) {
@@ -88,6 +89,7 @@ public class GameController {
                     }
                 }
         }
+        //enemy wypada za mapę
         for (GameObject enemy : enemies) {
             if (enemy.getView().getTranslateY() > 900 || enemy.getView().getTranslateY() < 0
                     || enemy.getView().getTranslateX() > 900 || enemy.getView().getTranslateX() < 0) {
@@ -96,7 +98,7 @@ public class GameController {
             }
         }
 
-
+//bullet uderza w lotnisko
         for (GameObject bullet : player.getBullets()) {
             for (GameObject airport : airports) {
                 if (bullet.isColliding(airport)) {
