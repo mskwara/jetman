@@ -1,10 +1,5 @@
 package sample;
 
-import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.GameWorld;
-import com.almasb.fxgl.entity.components.PositionComponent;
-import com.almasb.fxgl.particle.ParticleEmitter;
-import com.almasb.fxgl.particle.ParticleEmitters;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
@@ -20,12 +15,9 @@ import sample.ParticleSystem.Emitter;
 import sample.ParticleSystem.FireEmitter;
 import sample.ParticleSystem.Particle;
 import sample.controller.GameController;
-import sample.objects.Bullet;
 import sample.objects.Enemy;
 import sample.objects.GameObject;
-import sample.objects.Player;
-
-import java.util.List;
+import sample.objects.Gravity;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,10 +40,7 @@ public class Main extends Application {
         g = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
 
-        g.setGlobalAlpha(1.0);
-        g.setGlobalBlendMode(BlendMode.SRC_OVER);
-        g.setFill(Color.BLACK);
-        g.fillRect(0, 0, 900, 900);
+        defaultGraphicContext();
 
         gameController = new GameController();
         addGameObject(gameController.getPlayer(), 455, 320);
@@ -88,6 +77,13 @@ public class Main extends Application {
         addGameObject(airport, x, y);
     }
 
+    private void defaultGraphicContext() {
+        g.setGlobalAlpha(1.0);
+        g.setGlobalBlendMode(BlendMode.SRC_OVER);
+        g.setFill(Color.BLACK);
+        g.fillRect(0, 0, 900, 900);
+    }
+
     private void addGameObject(GameObject object, double x, double y) {
         object.getView().setTranslateX(x);
         object.getView().setTranslateY(y);
@@ -96,17 +92,11 @@ public class Main extends Application {
 
     private void onUpdate() {
         System.out.println("Bullets "+gameController.getPlayer().getBullets().size());
+        defaultGraphicContext();
         if(gameController.getPlayer().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer().getBullets()) {
-                g.setGlobalAlpha(1.0);
-                g.setGlobalBlendMode(BlendMode.SRC_OVER);
-                g.setFill(Color.BLACK);
-                g.fillRect(0, 0, 900, 900);
-
                 particles.addAll(emitter.emit(bullet.getView().getTranslateX(), bullet.getView().getTranslateY()));
 
-
-
                 for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
                     Particle p = it.next();
                     p.update();
@@ -116,17 +106,9 @@ public class Main extends Application {
                         continue;
                     }
                     p.render(g);
-
-
                 }
-
-
             }
         }   else{
-            g.setGlobalAlpha(1.0);
-            g.setGlobalBlendMode(BlendMode.SRC_OVER);
-            g.setFill(Color.BLACK);
-            g.fillRect(0, 0, 900, 900);
                 for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
                     Particle p = it.next();
                     p.update();
@@ -136,8 +118,6 @@ public class Main extends Application {
                         continue;
                     }
                     p.render(g);
-
-
                 }
         }
         double currentVelocityX = gameController.getPlayer().getVelocity().getX();
@@ -146,7 +126,7 @@ public class Main extends Application {
             currentVelocityX += gameController.getPlayer().getMultipleMotions().get(i).getX();
             currentVelocityY += gameController.getPlayer().getMultipleMotions().get(i).getY();
         }
-        currentVelocityY += gameController.getPlayer().getGravityFactor() * gameController.getGRAVITY();
+        currentVelocityY += gameController.getPlayer().getGravityFactor() * Gravity.GRAVITY;
         gameController.getPlayer().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
 
         gameController.updateGravity();

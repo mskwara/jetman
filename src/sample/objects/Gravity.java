@@ -3,7 +3,7 @@ package sample.objects;
 import java.util.List;
 
 public class Gravity {
-    private static final double GRAVITY = 1;
+    public static final double GRAVITY = 1;
 
     public static void updateGameObjectsGravity(List<GameObject> objects) {
         objects.forEach(Gravity::updateGameObjectGravity);
