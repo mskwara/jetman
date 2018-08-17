@@ -19,12 +19,29 @@ public class GameObject {
     private List<Point2D> multipleMotions = new ArrayList<>();
     private double gravityFactor = 1;
     private double maxGravityFactor = 10;
+    private boolean isOnGround = false;
+
+    private Point2D currentVelocity = new Point2D(0, 0);
+
 
 
     GameObject(Node view) {
         this.view = view;
     }
+    public boolean isOnGround() {
+        return isOnGround;
+    }
+    public Point2D getCurrentVelocity() {
+        return currentVelocity;
+    }
 
+    public void setCurrentVelocity(Point2D currentVelocity) {
+        this.currentVelocity = currentVelocity;
+    }
+
+    public void setOnGround(boolean onGround) {
+        isOnGround = onGround;
+    }
     public double getMaxGravityFactor() {
         return maxGravityFactor;
     }
@@ -52,15 +69,6 @@ public class GameObject {
     public void setMultipleMotions(List<Point2D> multipleMotions) {
         this.multipleMotions = multipleMotions;
     }
-
-    public double getLastRotate() {
-        return lastRotate;
-    }
-
-    public void setLastRotate(double lastRotate) {
-        this.lastRotate = lastRotate;
-    }
-
 
     public double getSpeed() {
         return speed;

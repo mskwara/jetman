@@ -1,6 +1,8 @@
 package sample.controller;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import sample.objects.Airport;
 import sample.objects.GameObject;
 import sample.objects.Gravity;
 import sample.objects.Player;
@@ -13,12 +15,18 @@ import java.util.stream.Collectors;
 
 import static sample.objects.Player.PLAYER_SPEED_FACTOR;
 public class GameController {
+    public static double getGRAVITY() {
+        return GRAVITY;
+    }
+
     private static final double GRAVITY = 1;
     private static final int BULLET_SPEED_FACTOR = 10;
     private static final double GAME_OBJECT_SPEED_FACTOR = 1.07;
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
+    private List<GameObject> airports = new ArrayList<>();
     private Player player;
+    private Airport airport;
 
     public List<GameObject> getBullets() {
         return bullets;
@@ -30,36 +38,74 @@ public class GameController {
 
     public GameController() {
         player = new Player();
+        airport = new Airport();
     }
 
     public Player getPlayer() {
         return player;
+    }
+    public Airport getAirport() {
+        return airport;
+    }
+    public void addAirport(GameObject airport) {
+        airports.add(airport);
+        System.out.println("Airports: " + airports.size());
     }
 
     public void addEnemy(GameObject enemy) {
         enemies.add(enemy);
         System.out.println("Enemies: " + enemies.size());
     }
+    public void checkLanding(){
+        System.out.println("currentVel: " + player.getCurrentVelocity());
+        if(!player.isAccelerating() && player.isColliding(airport) && (player.getRotate()>=-96 && player.getRotate()<=-84)
+                && player.getCurrentVelocity().getX()<=3  && player.getCurrentVelocity().getY()<=3 && player.getCurrentVelocity().getY()>=0
+                && player.getView().getTranslateY()+20+5 <= airport.getView().getTranslateY()){
+            player.setVelocity(new Point2D(0,0));
+            List<Point2D> emptyList = new ArrayList<>();
+            player.setMultipleMotions(emptyList);
+            player.getView().setRotate(-90);
+            player.setOnGround(true);
+        } else{
+            player.setOnGround(false);
+        }
+    }
 
     public List<Node> gameObjectsToRemoveList() {
         List<Node> list = new ArrayList<>();
         for (GameObject bullet : player.getBullets()) {
-            for (GameObject enemy : enemies) {
-                if (enemy.getView().getTranslateY() > 900 || enemy.getView().getTranslateX() > 900) {
-                    enemy.setAlive(false);
+            if (bullet.getView().getTranslateY() > 900 || bullet.getView().getTranslateY() < 0
+                    || bullet.getView().getTranslateX() > 900 || bullet.getView().getTranslateX() < 0) {
+                bullet.setAlive(false);
+                list.add(bullet.getView());
+            }
+                for (GameObject enemy : enemies) {
+                    if (bullet.isColliding(enemy)) {
+                        bullet.setAlive(false);
+                        enemy.setAlive(false);
+                        list.add(bullet.getView());
+                        list.add(enemy.getView());
+                    }
                 }
-                if (bullet.getView().getTranslateY() > 900 || bullet.getView().getTranslateX() > 900) {
-                    bullet.setAlive(false);
+        }
+        for (GameObject enemy : enemies) {
+            if (enemy.getView().getTranslateY() > 900 || enemy.getView().getTranslateY() < 0
+                    || enemy.getView().getTranslateX() > 900 || enemy.getView().getTranslateX() < 0) {
+                enemy.setAlive(false);
+                list.add(enemy.getView());
+            }
+        }
 
-                }
-                if (bullet.isColliding(enemy)) {
+
+        for (GameObject bullet : player.getBullets()) {
+            for (GameObject airport : airports) {
+                if (bullet.isColliding(airport)) {
                     bullet.setAlive(false);
-                    enemy.setAlive(false);
                     list.add(bullet.getView());
-                    list.add(enemy.getView());
                 }
             }
         }
+
         player.getBullets().removeIf(GameObject::isDead);
         enemies.removeIf(GameObject::isDead);
 

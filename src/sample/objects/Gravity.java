@@ -23,20 +23,25 @@ public class Gravity {
     }
 
     private static void updatePlayerGravity(Player player){
-        if (player.isAccelerating()) {
-            if (player.getGravityFactor() > 1) {
-                player.changeGravityFactor(-0.07);
+        if(!player.isOnGround()) {
+            if (player.isAccelerating()) {
+                if (player.getGravityFactor() > 1) {
+                    player.changeGravityFactor(-0.07);
+                } else {
+                    player.setGravityFactor(1);
+                }
             } else {
-                player.setGravityFactor(1);
-            }
-        } else {
-            if (player.getGravityFactor() < player.getMaxGravityFactor()) {
-                player.changeGravityFactor(0.07);
+                if (player.getGravityFactor() < player.getMaxGravityFactor()) {
+                    player.changeGravityFactor(0.07);
 
-            } else {
-                player.setGravityFactor(player.getMaxGravityFactor());
+                } else {
+                    player.setGravityFactor(player.getMaxGravityFactor());
+                }
             }
+            player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
         }
-        player.getView().setTranslateY(player.getView().getTranslateY() + GRAVITY * player.getGravityFactor());
+        else {
+            player.setGravityFactor(0);
+        }
     }
 }

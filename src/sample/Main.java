@@ -56,6 +56,8 @@ public class Main extends Application {
         gameController = new GameController();
         addGameObject(gameController.getPlayer(), 300, 300);
 
+        addAirport(gameController.getAirport(), 400, 400);
+
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -80,6 +82,10 @@ public class Main extends Application {
         gameController.addEnemy(enemy);
         addGameObject(enemy, x, y);
     }
+    private void addAirport(GameObject airport, double x, double y) {
+        gameController.addAirport(airport);
+        addGameObject(airport, x, y);
+    }
 
     private void addGameObject(GameObject object, double x, double y) {
         object.getView().setTranslateX(x);
@@ -88,7 +94,7 @@ public class Main extends Application {
     }
 
     private void onUpdate() {
-        System.out.println(gameController.getPlayer().getBullets().size());
+        System.out.println("Bullets "+gameController.getPlayer().getBullets().size());
         if(gameController.getPlayer().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer().getBullets()) {
                 g.setGlobalAlpha(1.0);
@@ -133,9 +139,18 @@ public class Main extends Application {
 
                 }
         }
+        double currentVelocityX = gameController.getPlayer().getVelocity().getX();
+        double currentVelocityY = gameController.getPlayer().getVelocity().getY();
+        for(int i = 0 ; i < gameController.getPlayer().getMultipleMotions().size() ; i++){
+            currentVelocityX += gameController.getPlayer().getMultipleMotions().get(i).getX();
+            currentVelocityY += gameController.getPlayer().getMultipleMotions().get(i).getY();
+        }
+        currentVelocityY += gameController.getPlayer().getGravityFactor() * gameController.getGRAVITY();
+        gameController.getPlayer().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
 
         gameController.updateGravity();
         root.getChildren().removeAll(gameController.gameObjectsToRemoveList());
+        gameController.checkLanding();
 
         gameController.updateGameObjects();
         if (gameController.getPlayer().isShooting()) {
