@@ -22,7 +22,7 @@ public class Particle {
         this.decay = decay;
     }
 
-    public Particle(double x, double y, Point2D velocity, double radius, double expireTime, Paint color, BlendMode blendMode){
+    Particle(double x, double y, Point2D velocity, double radius, double expireTime, Paint color, BlendMode blendMode){
         this.x = x;
         this.y = y;
         this.velocity = velocity;
