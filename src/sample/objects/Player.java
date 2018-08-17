@@ -1,9 +1,7 @@
 package sample.objects;
 
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.TriangleMesh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ public class Player extends GameObject {
     private static final double MAX_GRAVITY_FACTOR = 5;
     private Weapon weapon;
 
-    private static final int PLAYER_WIDTH = 40;
+    public static final int PLAYER_WIDTH = 40;
     private static final int PLAYER_HEIGHT = 20;
     private List<GameObject> bullets = new ArrayList<>();
 
@@ -56,13 +54,5 @@ public class Player extends GameObject {
                 .map(vector -> vector.multiply(0.98))
                 .collect(Collectors.toList()));
         getMultipleMotions().forEach(this::updatePosition);
-    }
-
-    public static int getPlayerWidth() {
-        return PLAYER_WIDTH;
-    }
-
-    public static int getPlayerHeight() {
-        return PLAYER_HEIGHT;
     }
 }

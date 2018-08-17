@@ -116,6 +116,10 @@ public class GameObject {
         this.velocity = velocity;
     }
 
+    public void setVelocity(double x, double y) {
+        this.velocity = new Point2D(x, y);
+    }
+
     public Point2D getVelocity() {
         return velocity;
     }

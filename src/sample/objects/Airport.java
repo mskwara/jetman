@@ -14,14 +14,20 @@ public class Airport extends GameObject {
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
     }
 
-
-
-
-    public static int getAirportWidth() {
-        return AIRPORT_WIDTH;
+    public boolean canPlayerLanding(Player player) {
+        return !player.isAccelerating() && player.isColliding(this) && hasVerticalPosition(player)
+                && hasSlowSpeed(player) && isAboveAirport(player);
     }
 
-    public static int getAirportHeight() {
-        return AIRPORT_HEIGHT;
+    private boolean isAboveAirport(Player player) {
+        return player.getView().getTranslateY() + Player.PLAYER_WIDTH / 2 + Airport.AIRPORT_HEIGHT / 2 <= getView().getTranslateY();
+    }
+
+    private boolean hasVerticalPosition(Player player) {
+        return player.getRotate() >= -96 && player.getRotate() <= -84;
+    }
+
+    private boolean hasSlowSpeed(Player player) {
+        return player.getCurrentVelocity().getX() <= 3 && player.getCurrentVelocity().getY() <= 3;
     }
 }
