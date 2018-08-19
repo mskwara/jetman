@@ -18,8 +18,8 @@ public class Player extends GameObject {
     private static final int PLAYER_HEIGHT = 20;
     private List<GameObject> bullets = new ArrayList<>();
 
-    public Player() {
-        super(new Rectangle(PLAYER_WIDTH, PLAYER_HEIGHT, Color.BLUE));
+    public Player(Color color) {
+        super(new Rectangle(PLAYER_WIDTH, PLAYER_HEIGHT, color));
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
         weapon = new Gun();
     }

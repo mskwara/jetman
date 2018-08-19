@@ -46,4 +46,23 @@ public class Collision {
         }
         return list;
     }
+
+    public static List<GameObject> getBulletsHitPlayersCollisions(List<Player> players) {
+        List<GameObject> allBullets = players.stream()
+                .flatMap(player -> player.getBullets().stream())
+                .collect(Collectors.toList());
+        List<GameObject> list = new ArrayList<>();
+        for (GameObject bullet : allBullets) {
+            for (GameObject player : players) {
+                if (bullet.isColliding(player)) {
+                    bullet.setAlive(false);
+                    player.setAlive(false);
+                    list.add(bullet);
+                    list.add(player);
+                }
+            }
+        }
+        return list;
+
+    }
 }
