@@ -12,7 +12,6 @@ public class GameObject {
     private boolean alive = true;
     private boolean turningRight = false;
     private boolean turningLeft = false;
-    private double lastRotate;
     private double speed;
     private boolean isAccelerating = false;
     private boolean isShooting = false;
@@ -24,13 +23,14 @@ public class GameObject {
     private Point2D currentVelocity = new Point2D(0, 0);
 
 
-
     GameObject(Node view) {
         this.view = view;
     }
+
     public boolean isOnGround() {
         return isOnGround;
     }
+
     public Point2D getCurrentVelocity() {
         return currentVelocity;
     }
@@ -42,6 +42,7 @@ public class GameObject {
     public void setOnGround(boolean onGround) {
         isOnGround = onGround;
     }
+
     public double getMaxGravityFactor() {
         return maxGravityFactor;
     }
@@ -58,7 +59,7 @@ public class GameObject {
         this.gravityFactor = gravityFactor;
     }
 
-    public void changeGravityFactor(double diff){
+    public void changeGravityFactor(double diff) {
         this.gravityFactor += diff;
     }
 
@@ -154,12 +155,12 @@ public class GameObject {
 
     public void rotateRight() {
         //lastRotate = view.getRotate();
-        if(view.getRotate() == 363){
+        if (view.getRotate() == 363) {
             view.setRotate(3);
-        }   else {
+        } else {
             view.setRotate(view.getRotate() + 3);
         }
-        System.out.println(view.getRotate());
+//        System.out.println(view.getRotate());
         if (isAccelerating) {
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).normalize().multiply(speed));
         }
@@ -167,12 +168,12 @@ public class GameObject {
 
     public void rotateLeft() {
         //lastRotate = view.getRotate();
-        if(view.getRotate() == -363){
+        if (view.getRotate() == -363) {
             view.setRotate(-3);
-        }   else {
+        } else {
             view.setRotate(view.getRotate() - 3);
         }
-        System.out.println(view.getRotate());
+//        System.out.println(view.getRotate());
         if (isAccelerating) {
             setVelocity(new Point2D(Math.cos(Math.toRadians(getRotate())), Math.sin(Math.toRadians(getRotate()))).normalize().multiply(speed));
         }
@@ -182,22 +183,24 @@ public class GameObject {
         return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
     }
 
-    public boolean hasSpeed(){
-        return speed !=0;
+    public boolean hasSpeed() {
+        return speed != 0;
     }
 
-    public boolean hasVelocity(){
+    public boolean hasVelocity() {
         return velocity.getX() != 0 || velocity.getY() != 0;
     }
 
-    public double cosRotation(){
+    public double cosRotation() {
         return Math.cos(Math.toRadians(getRotate()));
     }
-    public double sinRotation(){
+
+    public double sinRotation() {
         return Math.sin(Math.toRadians(getRotate()));
     }
-    public Point2D createVector(){
-        return new Point2D(cosRotation(),sinRotation());
+
+    public Point2D createVector() {
+        return new Point2D(cosRotation(), sinRotation());
     }
 
 }
