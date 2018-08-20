@@ -24,7 +24,7 @@ public class Airport extends GameObject {
     }
 
     private boolean hasVerticalPosition(Player player) {
-        return player.getRotate() >= -96 && player.getRotate() <= -84;
+        return (player.getRotate() >= -96 && player.getRotate() <= -84) || (player.getRotate() >= 264 && player.getRotate() <= 276);
     }
 
     private boolean hasSlowSpeed(Player player) {

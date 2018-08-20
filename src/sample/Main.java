@@ -16,10 +16,7 @@ import sample.ParticleSystem.Emitter;
 import sample.ParticleSystem.FireEmitter;
 import sample.ParticleSystem.Particle;
 import sample.controller.GameController;
-import sample.objects.Enemy;
-import sample.objects.GameObject;
-import sample.objects.Gravity;
-import sample.objects.Player;
+import sample.objects.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,13 +67,18 @@ public class Main extends Application {
     }
 
     private void addBullets(Player player) {
-        player.fire().forEach(bullet -> addBullet(player, bullet, player.getView().getTranslateX() + 50, player.getView().getTranslateY() + 50));
+        double alfa = Math.toRadians(player.getRotate());
+        double x = (player.PLAYER_WIDTH / 2 + 20) * Math.cos(alfa);   //rysunek poglądowy w paincie
+        double y = (player.PLAYER_WIDTH / 2 + 20) * Math.sin(alfa);
+        player.fire().forEach(bullet -> addBullet(player, bullet, player.getView().getTranslateX() + (player.PLAYER_WIDTH / 2 - 5) + x, player.getView().getTranslateY() + (player.PLAYER_HEIGHT / 2) + y));
+        //powyższa linijka to pozycja statku + jego połowa wymiatu, żeby mieć punkt środka pojazdu + odpowiedni x i y aby pocisk strzelał z przodu a nie ze środka
     }
 
     private void addEnemy(GameObject enemy, double x, double y) {
         gameController.addEnemy(enemy);
         addGameObject(enemy, x, y);
     }
+
     private void addAirport(GameObject airport, double x, double y) {
         gameController.addAirport(airport);
         addGameObject(airport, x, y);
@@ -96,54 +98,32 @@ public class Main extends Application {
     }
 
     private void onUpdate() {
-        System.out.println("Bullets " + gameController.getPlayer1().getBullets().size());
+        //System.out.println(gameController.getPlayer1().getView().getTranslateX()+" "+gameController.getPlayer1().getView().getTranslateY());
+        //System.out.println("Rotate " + gameController.getPlayer1().getRotate());
         defaultGraphicContext();
-        if (gameController.getPlayer1().getBullets().size() != 0) {
+        if (gameController.getPlayer1().getBullets().size() != 0 || gameController.getPlayer2().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer1().getBullets()) {
-                particles.addAll(emitter.emit(bullet.getView().getTranslateX(), bullet.getView().getTranslateY()));
-
-                for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
-                    Particle p = it.next();
-                    p.update();
-
-                    if (!p.isAlive()) {
-                        it.remove();
-                        continue;
-                    }
-                    p.render(g);
-                }
+                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY());
             }
-        }   else{
-                for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
-                    Particle p = it.next();
-                    p.update();
+            for (GameObject bullet : gameController.getPlayer2().getBullets()) {
+                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY());
+            }
+        } else {
+            for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
+                Particle p = it.next();
+                p.update();
 
-                    if (!p.isAlive()) {
-                        it.remove();
-                        continue;
-                    }
-                    p.render(g);
+                if (!p.isAlive()) {
+                    it.remove();
+                    continue;
                 }
+                p.render(g);
+            }
         }
-        double currentVelocityX = gameController.getPlayer1().getVelocity().getX();
-        double currentVelocityY = gameController.getPlayer1().getVelocity().getY();
-        for (int i = 0; i < gameController.getPlayer1().getMultipleMotions().size(); i++) {
-            currentVelocityX += gameController.getPlayer1().getMultipleMotions().get(i).getX();
-            currentVelocityY += gameController.getPlayer1().getMultipleMotions().get(i).getY();
-        }
-        currentVelocityY += gameController.getPlayer1().getGravityFactor() * Gravity.GRAVITY;
-        gameController.getPlayer1().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
 
-        currentVelocityX = gameController.getPlayer2().getVelocity().getX();
-        currentVelocityY = gameController.getPlayer2().getVelocity().getY();
-        for (int i = 0; i < gameController.getPlayer2().getMultipleMotions().size(); i++) {
-            currentVelocityX += gameController.getPlayer2().getMultipleMotions().get(i).getX();
-            currentVelocityY += gameController.getPlayer2().getMultipleMotions().get(i).getY();
-        }
-        currentVelocityY += gameController.getPlayer2().getGravityFactor() * Gravity.GRAVITY;
-        gameController.getPlayer2().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
+        changeCurrentVelocity();
 
-
+        //
         gameController.updateGravity();
         root.getChildren().removeAll(gameController.gameObjectsToRemoveList());
         gameController.checkLanding();
@@ -165,6 +145,41 @@ public class Main extends Application {
 
     private void shot(Player player) {
         addBullets(player);
+    }
+
+    private void drawParticles(double x, double y) {
+        particles.addAll(emitter.emit(x, y));
+
+        for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
+            Particle p = it.next();
+            p.update();
+
+            if (!p.isAlive()) {
+                it.remove();
+                continue;
+            }
+            p.render(g);
+        }
+    }
+
+    private void changeCurrentVelocity() {
+        double currentVelocityX = gameController.getPlayer1().getVelocity().getX();
+        double currentVelocityY = gameController.getPlayer1().getVelocity().getY();
+        for (int i = 0; i < gameController.getPlayer1().getMultipleMotions().size(); i++) {
+            currentVelocityX += gameController.getPlayer1().getMultipleMotions().get(i).getX();
+            currentVelocityY += gameController.getPlayer1().getMultipleMotions().get(i).getY();
+        }
+        currentVelocityY += gameController.getPlayer1().getGravityFactor() * Gravity.GRAVITY;
+        gameController.getPlayer1().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
+
+        currentVelocityX = gameController.getPlayer2().getVelocity().getX();
+        currentVelocityY = gameController.getPlayer2().getVelocity().getY();
+        for (int i = 0; i < gameController.getPlayer2().getMultipleMotions().size(); i++) {
+            currentVelocityX += gameController.getPlayer2().getMultipleMotions().get(i).getX();
+            currentVelocityY += gameController.getPlayer2().getMultipleMotions().get(i).getY();
+        }
+        currentVelocityY += gameController.getPlayer2().getGravityFactor() * Gravity.GRAVITY;
+        gameController.getPlayer2().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
     }
 
     @Override

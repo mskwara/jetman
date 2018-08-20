@@ -14,7 +14,7 @@ public class FireEmitter extends Emitter{
 
         int numParticles = 1;
         for(int i = 0; i < numParticles ; i++){
-            Particle p = new Particle(x, y, new Point2D((Math.random()-0.5) * 0.1, Math.random() * 0.7), 12, 0.5, Color.rgb(191, 191 ,191), BlendMode.ADD);
+            Particle p = new Particle(x, y, new Point2D((Math.random()-0.5) * 2, Math.random() * 2), 12, 0.5, Color.rgb(191, 191 ,191), BlendMode.ADD);
             particles.add(p);
         }
         return particles;

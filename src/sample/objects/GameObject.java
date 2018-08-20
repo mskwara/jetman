@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameObject {
-    private Node view;
+    public Node view;
     private Point2D velocity = new Point2D(0, 0);
     private boolean alive = true;
     private boolean turningRight = false;
