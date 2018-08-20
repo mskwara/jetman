@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import sample.objects.*;
 import sample.utils.Helper;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -39,12 +40,12 @@ public class GameController {
 
     public void addAirport(GameObject airport) {
         airports.add(airport);
-        System.out.println("Airports: " + airports.size());
+        //System.out.println("Airports: " + airports.size());
     }
 
     public void addEnemy(GameObject enemy) {
         enemies.add(enemy);
-        System.out.println("Enemies: " + enemies.size());
+        //System.out.println("Enemies: " + enemies.size());
     }
 
     public void checkLanding() {
@@ -53,7 +54,7 @@ public class GameController {
     }
 
     private void checkLandingPlayerOnAirport(Player player, Airport airport) {
-        System.out.println("currentVel: " + player.getCurrentVelocity());
+        //System.out.println("currentVel: " + player.getCurrentVelocity());
         if (airport.canPlayerLanding(player)) {
             player.setVelocity(0, 0);
             player.setMultipleMotions(Collections.emptyList());

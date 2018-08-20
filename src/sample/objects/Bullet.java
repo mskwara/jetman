@@ -5,9 +5,10 @@ import javafx.scene.shape.Circle;
 
 public class Bullet extends GameObject {
     private static final double MAX_GRAVITY_FACTOR = 15;
+    static final int BULLET_RADIUS = 5;
 
     public Bullet(){
-        super(new Circle(5, 5, 5, Color.BROWN));
+        super(new Circle(5, 5, BULLET_RADIUS, Color.BROWN));
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
     }
 }
