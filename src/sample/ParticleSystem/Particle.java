@@ -5,10 +5,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import sample.objects.Bullet;
+import sample.objects.GameObject;
 
 public class Particle {
     private double x;
     private double y;
+    private GameObject emitter;
 
     private Point2D velocity;
     private double radius;
@@ -51,4 +54,13 @@ public class Particle {
         g.fillOval(x, y, radius, radius);
     }
 
+
+
+    public GameObject getEmitter() {
+        return emitter;
+    }
+
+    public void setEmitter(GameObject emitter) {
+        this.emitter = emitter;
+    }
 }

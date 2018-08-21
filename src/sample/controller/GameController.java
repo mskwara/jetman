@@ -48,6 +48,7 @@ public class GameController {
         //System.out.println("Enemies: " + enemies.size());
     }
 
+
     public void checkLanding() {
         checkLandingPlayerOnAirport(player1, airport);
         checkLandingPlayerOnAirport(player2, airport);
@@ -62,6 +63,7 @@ public class GameController {
             player.setOnGround(true);
         } else {
             player.setOnGround(false);
+            //player.setAlive(false);
         }
     }
 
@@ -74,9 +76,12 @@ public class GameController {
         //bullet uderza w enemy
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsEnemiesCollisions(player1, enemies)));
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsEnemiesCollisions(player2, enemies)));
+
         //bullet wypada za mapę
         list.addAll(Helper.gameObjectList2NodeList(Collision.getObjectsOutOfMap(player1.getBullets())));
         list.addAll(Helper.gameObjectList2NodeList(Collision.getObjectsOutOfMap(player2.getBullets())));
+        player1.getDiedBullets().addAll(Collision.getObjectsOutOfMap(player1.getBullets()));
+        player2.getDiedBullets().addAll(Collision.getObjectsOutOfMap(player2.getBullets()));
 
         //enemy wypada za mapę
         list.addAll(Helper.gameObjectList2NodeList(Collision.getObjectsOutOfMap(enemies)));
@@ -85,8 +90,10 @@ public class GameController {
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsHitAirport(player1, airports)));
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsHitAirport(player2, airports)));
 
+
         player1.getBullets().removeIf(GameObject::isDead);
         player2.getBullets().removeIf(GameObject::isDead);
+
         enemies.removeIf(GameObject::isDead);
 
 

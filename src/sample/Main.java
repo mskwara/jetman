@@ -3,6 +3,7 @@ package sample;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -18,13 +19,17 @@ import sample.ParticleSystem.Particle;
 import sample.controller.GameController;
 import sample.objects.*;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.pow;
+
 public class Main extends Application {
 
-    private Pane root;
+    private static Pane root;
     private GameController gameController;
     private Emitter emitter = new FireEmitter();
     private List<Particle> particles = new ArrayList<>();
@@ -84,6 +89,7 @@ public class Main extends Application {
         addGameObject(airport, x, y);
     }
 
+
     private void defaultGraphicContext() {
         g.setGlobalAlpha(1.0);
         g.setGlobalBlendMode(BlendMode.SRC_OVER);
@@ -91,35 +97,46 @@ public class Main extends Application {
         g.fillRect(0, 0, 900, 900);
     }
 
-    private void addGameObject(GameObject object, double x, double y) {
+    public static void addGameObject(GameObject object, double x, double y) {
         object.getView().setTranslateX(x);
         object.getView().setTranslateY(y);
         root.getChildren().add(object.getView());
     }
 
     private void onUpdate() {
+        System.out.println(gameController.getPlayer1().getBullets().size());
         //System.out.println(gameController.getPlayer1().getView().getTranslateX()+" "+gameController.getPlayer1().getView().getTranslateY());
         //System.out.println("Rotate " + gameController.getPlayer1().getRotate());
         defaultGraphicContext();
         if (gameController.getPlayer1().getBullets().size() != 0 || gameController.getPlayer2().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer1().getBullets()) {
-                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY());
+                    drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY(), bullet);
             }
             for (GameObject bullet : gameController.getPlayer2().getBullets()) {
-                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY());
-            }
-        } else {
-            for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
-                Particle p = it.next();
-                p.update();
-
-                if (!p.isAlive()) {
-                    it.remove();
-                    continue;
-                }
-                p.render(g);
+                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY(), bullet);
             }
         }
+        for(GameObject diedBullet : gameController.getPlayer1().getDiedBullets()){
+            drawDiedParticles(diedBullet.getView().getTranslateX(), diedBullet.getView().getTranslateY(), diedBullet);
+        }
+        for(GameObject diedBullet : gameController.getPlayer2().getDiedBullets()){
+            drawDiedParticles(diedBullet.getView().getTranslateX(), diedBullet.getView().getTranslateY(), diedBullet);
+        }
+//        else {
+//
+//            for (int i = 0; i < particles.size(); i++) {
+//                Particle p = particles.get(i);
+//
+//                    p.update();
+//
+//                    if (!p.isAlive()) {
+//                        particles.remove(i);
+//                        continue;
+//                    }
+//                    p.render(g);
+//
+//            }
+//        }
 
         changeCurrentVelocity();
 
@@ -141,24 +158,44 @@ public class Main extends Application {
         if (Math.random() < 0.02) {
             addEnemy(new Enemy(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
         }
+
+
     }
 
     private void shot(Player player) {
         addBullets(player);
     }
 
-    private void drawParticles(double x, double y) {
-        particles.addAll(emitter.emit(x, y));
+    private void drawParticles(double x, double y, GameObject bullet) {
+        particles.addAll(emitter.emit(x, y, bullet));
 
-        for (Iterator<Particle> it = particles.iterator(); it.hasNext(); ) {
-            Particle p = it.next();
-            p.update();
+        for (int i = 0; i < particles.size(); i++) {
+            Particle p = particles.get(i);
+            if(p.getEmitter() == bullet) {
+                p.update();
 
-            if (!p.isAlive()) {
-                it.remove();
-                continue;
+                if (!p.isAlive()) {
+                    particles.remove(i);
+                    continue;
+                }
+                p.render(g);
             }
-            p.render(g);
+        }
+
+    }
+    private void drawDiedParticles(double x, double y, GameObject diedBullet) {
+
+        for (int i = 0; i < particles.size(); i++) {
+            Particle p = particles.get(i);
+            if (p.getEmitter() == diedBullet) {
+                p.update();
+
+                if (!p.isAlive()) {
+                    particles.remove(i);
+                    continue;
+                }
+                p.render(g);
+            }
         }
     }
 

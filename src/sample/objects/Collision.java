@@ -28,6 +28,7 @@ public class Collision {
                     enemy.setAlive(false);
                     list.add(bullet);
                     list.add(enemy);
+                    player.getDiedBullets().add(bullet);
                 }
             }
         }
@@ -41,6 +42,7 @@ public class Collision {
                 if (bullet.isColliding(airport)) {
                     bullet.setAlive(false);
                     list.add(bullet);
+                    player.getDiedBullets().add(bullet);
                 }
             }
         }
@@ -53,12 +55,13 @@ public class Collision {
                 .collect(Collectors.toList());
         List<GameObject> list = new ArrayList<>();
         for (GameObject bullet : allBullets) {
-            for (GameObject player : players) {
+            for (Player player : players) {
                 if (bullet.isColliding(player)) {
                     bullet.setAlive(false);
                     player.setAlive(false);
                     list.add(bullet);
                     list.add(player);
+                    player.getDiedBullets().add(bullet);
                 }
             }
         }
