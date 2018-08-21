@@ -23,7 +23,7 @@ public class GameObject {
     private Point2D currentVelocity = new Point2D(0, 0);
 
 
-    GameObject(Node view) {
+    public GameObject(Node view) {
         this.view = view;
     }
 

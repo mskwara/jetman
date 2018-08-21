@@ -18,6 +18,7 @@ public class Player extends GameObject {
     public static final int PLAYER_WIDTH = 40;
     public static final int PLAYER_HEIGHT = 20;
     private List<GameObject> bullets = new ArrayList<>();
+    private List<GameObject> diedBullets = new ArrayList<>();
 
     public Player(Color color) {
         super(new Rectangle(PLAYER_WIDTH, PLAYER_HEIGHT, color));
@@ -28,6 +29,12 @@ public class Player extends GameObject {
     public List<GameObject> getBullets() {
         return bullets;
     }
+
+
+    public List<GameObject> getDiedBullets() {
+        return diedBullets;
+    }
+
 
     public void addBullet(GameObject bullet) {
         bullets.add(bullet);
@@ -41,14 +48,14 @@ public class Player extends GameObject {
                     if(Helper.round(getVelocity().getX()) != Helper.round(cosRotation() * getSpeed())
                             || Helper.round(getVelocity().getY()) != Helper.round(sinRotation() * getSpeed())){
                     bullet.setVelocity(createVector().normalize().multiply(BULLET_SPEED_FACTOR)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
-                    System.out.println("1");
+                    //System.out.println("1");
                 } else {
                     bullet.setVelocity(getVelocity().normalize().multiply(BULLET_SPEED_FACTOR));
-                    System.out.println("2");
+                    //System.out.println("2");
                 }
             } else {
                 bullet.setVelocity(createVector().normalize().multiply(BULLET_SPEED_FACTOR));
-                System.out.println("3");
+                //System.out.println("3");
             }
         }
         return firedBullets;
