@@ -84,7 +84,7 @@ public class Main extends Application {
         addGameObject(enemy, x, y);
     }
 
-    private void addAirport(GameObject airport, double x, double y) {
+    private void addAirport(Airport airport, double x, double y) {
         gameController.addAirport(airport);
         addGameObject(airport, x, y);
     }
@@ -104,9 +104,10 @@ public class Main extends Application {
     }
 
     private void onUpdate() {
-        System.out.println(gameController.getPlayer1().getBullets().size());
+        //System.out.println(gameController.getPlayer1().getCurrentVelocity()+" gravityF: "+gameController.getPlayer1().getGravityFactor());
+        //System.out.println(gameController.getPlayer1().getBullets().size());
         //System.out.println(gameController.getPlayer1().getView().getTranslateX()+" "+gameController.getPlayer1().getView().getTranslateY());
-        //System.out.println("Rotate " + gameController.getPlayer1().getRotate());
+        System.out.println("Rotate " + gameController.getPlayer1().getRotate());
         defaultGraphicContext();
         if (gameController.getPlayer1().getBullets().size() != 0 || gameController.getPlayer2().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer1().getBullets()) {
@@ -200,23 +201,36 @@ public class Main extends Application {
     }
 
     private void changeCurrentVelocity() {
-        double currentVelocityX = gameController.getPlayer1().getVelocity().getX();
-        double currentVelocityY = gameController.getPlayer1().getVelocity().getY();
-        for (int i = 0; i < gameController.getPlayer1().getMultipleMotions().size(); i++) {
-            currentVelocityX += gameController.getPlayer1().getMultipleMotions().get(i).getX();
-            currentVelocityY += gameController.getPlayer1().getMultipleMotions().get(i).getY();
+        double currentVelocityX = 0;
+        double currentVelocityY = 0;
+        if(!gameController.getPlayer1().isOnGround()) {
+            currentVelocityX = gameController.getPlayer1().getVelocity().getX();
+            currentVelocityY = gameController.getPlayer1().getVelocity().getY();
+            for (int i = 0; i < gameController.getPlayer1().getMultipleMotions().size(); i++) {
+                currentVelocityX += gameController.getPlayer1().getMultipleMotions().get(i).getX();
+                currentVelocityY += gameController.getPlayer1().getMultipleMotions().get(i).getY();
+            }
+            currentVelocityY += gameController.getPlayer1().getGravityFactor() * 0.7 * Gravity.GRAVITY;
+            if (gameController.getPlayer1().getView().getRotate() == -90 || gameController.getPlayer1().getView().getRotate() == -270
+                    || gameController.getPlayer1().getView().getRotate() == 90 || gameController.getPlayer1().getView().getRotate() == 270) {
+                currentVelocityX = 0;
+            }
+            gameController.getPlayer1().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
         }
-        currentVelocityY += gameController.getPlayer1().getGravityFactor() * Gravity.GRAVITY;
-        gameController.getPlayer1().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
-
-        currentVelocityX = gameController.getPlayer2().getVelocity().getX();
-        currentVelocityY = gameController.getPlayer2().getVelocity().getY();
-        for (int i = 0; i < gameController.getPlayer2().getMultipleMotions().size(); i++) {
-            currentVelocityX += gameController.getPlayer2().getMultipleMotions().get(i).getX();
-            currentVelocityY += gameController.getPlayer2().getMultipleMotions().get(i).getY();
+        if(!gameController.getPlayer2().isOnGround()) {
+            currentVelocityX = gameController.getPlayer2().getVelocity().getX();
+            currentVelocityY = gameController.getPlayer2().getVelocity().getY();
+            for (int i = 0; i < gameController.getPlayer2().getMultipleMotions().size(); i++) {
+                currentVelocityX += gameController.getPlayer2().getMultipleMotions().get(i).getX();
+                currentVelocityY += gameController.getPlayer2().getMultipleMotions().get(i).getY();
+            }
+            currentVelocityY += gameController.getPlayer2().getGravityFactor()*0.7 * Gravity.GRAVITY;
+            if (gameController.getPlayer2().getView().getRotate() == -90 || gameController.getPlayer2().getView().getRotate() == -270
+                    || gameController.getPlayer2().getView().getRotate() == 90 || gameController.getPlayer2().getView().getRotate() == 270) {
+                currentVelocityX = 0;
+            }
+            gameController.getPlayer2().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
         }
-        currentVelocityY += gameController.getPlayer2().getGravityFactor() * Gravity.GRAVITY;
-        gameController.getPlayer2().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
     }
 
     @Override
@@ -232,28 +246,44 @@ public class Main extends Application {
     private void onKeyPressed(KeyCode key) {
         switch (key) {
             case LEFT:
-                gameController.getPlayer1().setTurningLeft(true);
+                if(gameController.getPlayer1().isAlive()) {
+                    gameController.getPlayer1().setTurningLeft(true);
+                }
                 break;
             case RIGHT:
-                gameController.getPlayer1().setTurningRight(true);
+                if(gameController.getPlayer1().isAlive()) {
+                    gameController.getPlayer1().setTurningRight(true);
+                }
                 break;
             case ENTER:
-                gameController.getPlayer1().setShooting(true);
+                if(gameController.getPlayer1().isAlive()) {
+                    gameController.getPlayer1().setShooting(true);
+                }
                 break;
             case UP:
-                gameController.getPlayer1().setAccelerating(true);
+                if(gameController.getPlayer1().isAlive()) {
+                    gameController.getPlayer1().setAccelerating(true);
+                }
                 break;
             case A:
-                gameController.getPlayer2().setTurningLeft(true);
+                if(gameController.getPlayer2().isAlive()) {
+                    gameController.getPlayer2().setTurningLeft(true);
+                }
                 break;
             case D:
-                gameController.getPlayer2().setTurningRight(true);
+                if(gameController.getPlayer2().isAlive()) {
+                    gameController.getPlayer2().setTurningRight(true);
+                }
                 break;
             case TAB:
-                gameController.getPlayer2().setShooting(true);
+                if(gameController.getPlayer2().isAlive()) {
+                    gameController.getPlayer2().setShooting(true);
+                }
                 break;
             case W:
-                gameController.getPlayer2().setAccelerating(true);
+                if(gameController.getPlayer2().isAlive()) {
+                    gameController.getPlayer2().setAccelerating(true);
+                }
                 break;
 
         }

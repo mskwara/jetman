@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import static sample.objects.Gun.BULLET_SPEED_FACTOR;
 
 public class Player extends GameObject {
-    public static final double PLAYER_SPEED_FACTOR = 1.07;
+    public static final double PLAYER_SPEED_FACTOR = 1.1;
     private static final double MAX_GRAVITY_FACTOR = 5;
     private Weapon weapon;
 
@@ -19,10 +19,12 @@ public class Player extends GameObject {
     public static final int PLAYER_HEIGHT = 20;
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> diedBullets = new ArrayList<>();
+    private Color color;
 
     public Player(Color color) {
         super(new Rectangle(PLAYER_WIDTH, PLAYER_HEIGHT, color));
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
+        this.color = color;
         weapon = new Gun();
     }
 
@@ -67,5 +69,9 @@ public class Player extends GameObject {
                 .map(vector -> vector.multiply(0.98))
                 .collect(Collectors.toList()));
         getMultipleMotions().forEach(this::updatePosition);
+    }
+
+    public Color getColor() {
+        return color;
     }
 }
