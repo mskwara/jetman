@@ -19,15 +19,15 @@ public class Airport extends GameObject {
                 && hasSlowSpeed(player) && isAboveAirport(player);
     }
 
-    private boolean isAboveAirport(Player player) {
+    public boolean isAboveAirport(Player player) {
         return player.getView().getTranslateY() + Player.PLAYER_WIDTH / 2 + Airport.AIRPORT_HEIGHT / 2 <= getView().getTranslateY();
     }
 
-    private boolean hasVerticalPosition(Player player) {
-        return (player.getRotate() >= -96 && player.getRotate() <= -84) || (player.getRotate() >= 264 && player.getRotate() <= 276);
+    public boolean hasVerticalPosition(Player player) {
+        return (player.getRotate() >= -99 && player.getRotate() <= -81) || (player.getRotate() >= 261 && player.getRotate() <= 279);
     }
 
-    private boolean hasSlowSpeed(Player player) {
-        return player.getCurrentVelocity().getX() <= 3 && player.getCurrentVelocity().getY() <= 3;
+    public boolean hasSlowSpeed(Player player) {
+        return Math.abs(player.getCurrentVelocity().getX()) <= 3 && player.getCurrentVelocity().getY() <= 2.2;
     }
 }

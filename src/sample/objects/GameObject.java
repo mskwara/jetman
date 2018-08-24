@@ -2,6 +2,7 @@ package sample.objects;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,10 @@ public class GameObject {
 
     public GameObject(Node view) {
         this.view = view;
+    }
+    public GameObject() {
+        view = new Circle(1);
+        view.setVisible(false);
     }
 
     public boolean isOnGround() {
