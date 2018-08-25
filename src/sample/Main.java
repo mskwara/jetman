@@ -45,6 +45,9 @@ public class Main extends Application {
         gameController = new GameController();
         addGameObject(gameController.getPlayer1(), 455, 320);
         addGameObject(gameController.getPlayer2(), 400, 320);
+        root.getChildren().add(gameController.getPlayer1Label());
+        root.getChildren().add(gameController.getPlayer2Label());
+        root.getChildren().add(gameController.getEndGameLabel());
 
         gameController.getPlayer1().getView().setRotate(-90);
         gameController.getPlayer2().getView().setRotate(-90);
@@ -139,6 +142,7 @@ public class Main extends Application {
         if (Math.random() < 0.02) {
             addEnemy(new Enemy(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
         }
+        gameController.isEndGame();
 
 
     }

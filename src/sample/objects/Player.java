@@ -6,6 +6,7 @@ import javafx.scene.shape.Rectangle;
 import sample.utils.Helper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +22,48 @@ public class Player extends GameObject {
     private List<GameObject> bullets = new ArrayList<>();
     private List<GameObject> diedBullets = new ArrayList<>();
     private Color color;
+    private int score = 0;
+    private String name = "Player";
+    private double defaultXPosition;
+    private double defaultYPosition;
 
-    public Player(Color color) {
+
+    public Player(String name, Color color, double x, double y) {
         super(new Rectangle(PLAYER_WIDTH, PLAYER_HEIGHT, color));
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
         this.color = color;
+        this.name = name;
+        this.defaultXPosition = x;
+        this.defaultYPosition = y;
         weapon = new Gun();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getDefaultXPosition() {
+        return defaultXPosition;
+    }
+
+    public double getDefaultYPosition() {
+        return defaultYPosition;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void addScroe(int amount) {
+        this.score += amount;
+    }
+
+    public String getScoreLabel() {
+        return this.name + ": " + score;
     }
 
     public List<GameObject> getBullets() {
@@ -82,6 +119,14 @@ public class Player extends GameObject {
             }
             setCurrentVelocity(currentVelocity);
         }
+    }
+
+    public void respawn() {
+        getView().setTranslateX(getDefaultXPosition());
+        getView().setTranslateY(getDefaultYPosition());
+        getView().setRotate(-90);
+        setVelocity(0, 0);
+        setMultipleMotions(Collections.emptyList());
     }
 
     public Color getColor() {

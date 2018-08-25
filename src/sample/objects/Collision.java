@@ -56,6 +56,14 @@ public class Collision {
                 .collect(Collectors.toList());
     }
 
+    public static List<GameObject> getPlayersOutOfMap(List<Player> players) {
+        return players.stream()
+                .filter(Collision::isObjectOutOfMap)
+                .peek(Player::respawn)
+                .collect(Collectors.toList());
+    }
+
+
     private static boolean isObjectOutOfMap(GameObject object) {
         return object.getView().getTranslateY() > 900 || object.getView().getTranslateY() < 0
                 || object.getView().getTranslateX() > 900 || object.getView().getTranslateX() < 0;
@@ -71,6 +79,7 @@ public class Collision {
                     list.add(bullet);
                     list.add(enemy);
                     player.getDiedBullets().add(bullet);
+                    player.addScroe(Score.HIT_ENEMY_SCORE);
                 }
             }
         }
@@ -91,15 +100,16 @@ public class Collision {
         return list;
     }
 
-    public static List<GameObject> getPlayerHitAirport(Player player, List<Airport> airports) {
+    public static List<GameObject> getPlayerHitAirport(Player player, Player otherPlayer, List<Airport> airports) {
         List<GameObject> list = new ArrayList<>();
         for (Airport airport : airports) {
             if (player.isColliding(airport) && (!airport.hasSlowSpeed(player) || !airport.hasVerticalPosition(player) || !airport.isAboveAirport(player))) {
                 System.out.println("tutaj: " + player.getCurrentVelocity());
-                player.setAlive(false);
-                list.add(player);
+//                player.setAlive(false);
+//                list.add(player);
+                otherPlayer.addScroe(Score.HIT_PLAYER_SCORE);
                 destroyPlayerWithCrashSpeed(player, new Point2D(player.getCurrentVelocity().getX(), player.getCurrentVelocity().getY()), 0.8);
-
+                player.respawn();
             }
         }
         return list;
@@ -111,19 +121,28 @@ public class Collision {
                 .collect(Collectors.toList());
         List<GameObject> list = new ArrayList<>();
         for (GameObject bullet : allBullets) {
-            for (Player player : players) {
-                if (bullet.isColliding(player)) {
-                    bullet.setAlive(false);
-                    player.setAlive(false);
-                    list.add(bullet);
-                    list.add(player);
-                    destroyPlayerWithCrashSpeed(player, new Point2D(bullet.getVelocity().getX() / 2, bullet.getVelocity().getY() / 2), 5);
-                    player.getDiedBullets().add(bullet);
-                }
-            }
+//            for (Player player : players) {
+            Player p1 = players.get(0);
+            Player p2 = players.get(1);
+            playerBulletCollision(p1, p2, bullet, list);
+            playerBulletCollision(p2, p1, bullet, list);
+//            }
         }
         return list;
 
+    }
+
+    private static void playerBulletCollision(Player player, Player shootingPlayer, GameObject bullet, List<GameObject> list) {
+        if (bullet.isColliding(player)) {
+            shootingPlayer.addScroe(Score.HIT_PLAYER_SCORE);
+            bullet.setAlive(false);
+//                    player.setAlive(false);
+            list.add(bullet);
+            //list.add(player);
+            destroyPlayerWithCrashSpeed(player, new Point2D(bullet.getVelocity().getX() / 2, bullet.getVelocity().getY() / 2), 5);
+            player.respawn();
+            player.getDiedBullets().add(bullet);
+        }
     }
 
     public static List<GameObject> removePixels() {
