@@ -28,6 +28,6 @@ public class Airport extends GameObject {
     }
 
     public boolean hasSlowSpeed(Player player) {
-        return Math.abs(player.getCurrentVelocity().getX()) <= 3 && player.getCurrentVelocity().getY() <= 2.2;
+        return Math.abs(player.getCurrentVelocity().getX()) <= 6 && player.getCurrentVelocity().getY() <= 2.2;
     }
 }

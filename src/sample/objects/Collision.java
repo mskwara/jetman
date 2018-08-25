@@ -56,11 +56,10 @@ public class Collision {
                 .collect(Collectors.toList());
     }
 
-    public static List<GameObject> getPlayersOutOfMap(List<Player> players) {
-        return players.stream()
+    public static void getPlayersOutOfMap(List<Player> players) {
+        players.stream()
                 .filter(Collision::isObjectOutOfMap)
-                .peek(Player::respawn)
-                .collect(Collectors.toList());
+                .forEach(Player::respawn);
     }
 
 
@@ -134,13 +133,16 @@ public class Collision {
 
     private static void playerBulletCollision(Player player, Player shootingPlayer, GameObject bullet, List<GameObject> list) {
         if (bullet.isColliding(player)) {
-            shootingPlayer.addScroe(Score.HIT_PLAYER_SCORE);
             bullet.setAlive(false);
 //                    player.setAlive(false);
             list.add(bullet);
             //list.add(player);
-            destroyPlayerWithCrashSpeed(player, new Point2D(bullet.getVelocity().getX() / 2, bullet.getVelocity().getY() / 2), 5);
-            player.respawn();
+            player.changeHealth(-Gun.DAMAGES);
+            if (player.getHealth() < 0) {
+                destroyPlayerWithCrashSpeed(player, new Point2D(bullet.getVelocity().getX() / 2, bullet.getVelocity().getY() / 2), 5);
+                shootingPlayer.addScroe(Score.HIT_PLAYER_SCORE);
+                player.respawn();
+            }
             player.getDiedBullets().add(bullet);
         }
     }
