@@ -216,6 +216,11 @@ public class GameController {
             player.rotateRight();
         }
         player.moveInterial();
+
+        if (player.isOnGround()) {
+            player.reloadWeapon();
+            player.changeHealth(0.2);
+        }
     }
 
     private boolean hasNotMaxSpeed(GameObject object) {

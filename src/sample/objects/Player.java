@@ -15,6 +15,7 @@ import static sample.objects.Gun.BULLET_SPEED_FACTOR;
 public class Player extends GameObject {
     public static final double PLAYER_SPEED_FACTOR = 1.1;
     private static final double MAX_GRAVITY_FACTOR = 5;
+    public static final double MAX_HEALTH = 100;
     private Weapon weapon;
 
     public static final int PLAYER_WIDTH = 40;
@@ -23,6 +24,7 @@ public class Player extends GameObject {
     private List<GameObject> diedBullets = new ArrayList<>();
     private Color color;
     private int score = 0;
+    private double health = MAX_HEALTH;
     private String name = "Player";
     private double defaultXPosition;
     private double defaultYPosition;
@@ -36,6 +38,18 @@ public class Player extends GameObject {
         this.defaultXPosition = x;
         this.defaultYPosition = y;
         weapon = new Gun();
+    }
+
+    public double getHealth() {
+        return health;
+    }
+
+    public void changeHealth(double amount) {
+        health = health <= 100 ? health + amount : MAX_HEALTH;
+    }
+
+    public void setHealth(double health) {
+        this.health = health;
     }
 
     public String getName() {
@@ -63,7 +77,7 @@ public class Player extends GameObject {
     }
 
     public String getScoreLabel() {
-        return this.name + ": " + score;
+        return String.format("%s: %d\nHealth: %d%%\nShots: %d", name, score, (int) health, ((Gun) weapon).getBulletsNumber());
     }
 
     public List<GameObject> getBullets() {
@@ -127,9 +141,15 @@ public class Player extends GameObject {
         getView().setRotate(-90);
         setVelocity(0, 0);
         setMultipleMotions(Collections.emptyList());
+        setGravityFactor(1);
+        setHealth(MAX_HEALTH);
     }
 
     public Color getColor() {
         return color;
+    }
+
+    public void reloadWeapon() {
+        ((Gun) weapon).changeBulletsNumber(0.08);
     }
 }
