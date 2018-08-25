@@ -1,5 +1,6 @@
 package sample.objects;
 
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import sample.utils.Helper;
@@ -42,13 +43,13 @@ public class Player extends GameObject {
         bullets.add(bullet);
     }
 
-    public List<GameObject> fire(){
+    public List<GameObject> fire() {
         List<GameObject> firedBullets = weapon.fire();
-        for(GameObject bullet : firedBullets){
+        for (GameObject bullet : firedBullets) {
             if (hasSpeed()) { //jeśli statek się porusza
                 //if (getVelocity().getX() != cosRotation() || getVelocity().getY() != sinRotation()) {
-                    if(Helper.round(getVelocity().getX()) != Helper.round(cosRotation() * getSpeed())
-                            || Helper.round(getVelocity().getY()) != Helper.round(sinRotation() * getSpeed())){
+                if (Helper.round(getVelocity().getX()) != Helper.round(cosRotation() * getSpeed())
+                        || Helper.round(getVelocity().getY()) != Helper.round(sinRotation() * getSpeed())) {
                     bullet.setVelocity(createVector().normalize().multiply(BULLET_SPEED_FACTOR)); //ten if jest gdy statek zwalnia, a gracz go obróci i zacznie lecieć w inną stronę
                     //System.out.println("1");
                 } else {
@@ -63,12 +64,24 @@ public class Player extends GameObject {
         return firedBullets;
     }
 
-    public void moveInterial(){
+    public void moveInterial() {
         setMultipleMotions(getMultipleMotions().stream()
                 .filter(vector -> Math.abs(vector.getX()) >= 0.04 || Math.abs(vector.getY()) >= 0.04)
                 .map(vector -> vector.multiply(0.98))
                 .collect(Collectors.toList()));
         getMultipleMotions().forEach(this::updatePosition);
+    }
+
+    public void changeCurrentVelocity() {
+        if (!isOnGround()) {
+            Point2D currentVelocity = getVelocity().add(getMultipleMotions().stream().reduce(Point2D::add).orElse(new Point2D(0, 0)));
+            currentVelocity = currentVelocity.add(0, getGravityFactor() * 0.7 * Gravity.GRAVITY);
+            if (getView().getRotate() == -90 || getView().getRotate() == -270
+                    || getView().getRotate() == 90 || getView().getRotate() == 270) {
+                currentVelocity = new Point2D(0, currentVelocity.getY());
+            }
+            setCurrentVelocity(currentVelocity);
+        }
     }
 
     public Color getColor() {

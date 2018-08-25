@@ -3,19 +3,15 @@ package sample.controller;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import sample.Main;
 import sample.objects.*;
 import sample.utils.Helper;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static sample.objects.Player.PLAYER_HEIGHT;
 import static sample.objects.Player.PLAYER_SPEED_FACTOR;
-import static sample.objects.Player.PLAYER_WIDTH;
 
 public class GameController {
     private List<GameObject> enemies = new ArrayList<>();
@@ -68,7 +64,7 @@ public class GameController {
         //System.out.println("currentVel: " + player.getCurrentVelocity());
         if (airport.canPlayerLanding(player)) {
             player.setVelocity(0, 0);
-            player.setCurrentVelocity(new Point2D(0,0));
+            player.setCurrentVelocity(new Point2D(0, 0));
             player.setMultipleMotions(Collections.emptyList());
             player.getView().setRotate(-90);
             player.setOnGround(true);
@@ -179,5 +175,9 @@ public class GameController {
         Gravity.updatePlayersGravity(Collections.singletonList(player2));
     }
 
+    public void changePlayersCurrentVelocity() {
+        player1.changeCurrentVelocity();
+        player2.changeCurrentVelocity();
+    }
 
 }
