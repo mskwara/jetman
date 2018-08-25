@@ -2,8 +2,6 @@ package sample;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.geometry.Point2D;
-import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -17,15 +15,13 @@ import sample.ParticleSystem.Emitter;
 import sample.ParticleSystem.FireEmitter;
 import sample.ParticleSystem.Particle;
 import sample.controller.GameController;
-import sample.objects.*;
+import sample.objects.Airport;
+import sample.objects.Enemy;
+import sample.objects.GameObject;
+import sample.objects.Player;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import static java.lang.Math.cos;
-import static java.lang.Math.pow;
 
 public class Main extends Application {
 
@@ -49,6 +45,9 @@ public class Main extends Application {
         gameController = new GameController();
         addGameObject(gameController.getPlayer1(), 455, 320);
         addGameObject(gameController.getPlayer2(), 400, 320);
+        root.getChildren().add(gameController.getPlayer1Label());
+        root.getChildren().add(gameController.getPlayer2Label());
+        root.getChildren().add(gameController.getEndGameLabel());
 
         gameController.getPlayer1().getView().setRotate(-90);
         gameController.getPlayer2().getView().setRotate(-90);
@@ -73,9 +72,9 @@ public class Main extends Application {
 
     private void addBullets(Player player) {
         double alfa = Math.toRadians(player.getRotate());
-        double x = (player.PLAYER_WIDTH / 2 + 20) * Math.cos(alfa);   //rysunek poglądowy w paincie
-        double y = (player.PLAYER_WIDTH / 2 + 20) * Math.sin(alfa);
-        player.fire().forEach(bullet -> addBullet(player, bullet, player.getView().getTranslateX() + (player.PLAYER_WIDTH / 2 - 5) + x, player.getView().getTranslateY() + (player.PLAYER_HEIGHT / 2) + y));
+        double x = (Player.PLAYER_WIDTH / 2 + 20) * Math.cos(alfa);   //rysunek poglądowy w paincie
+        double y = (Player.PLAYER_WIDTH / 2 + 20) * Math.sin(alfa);
+        player.fire().forEach(bullet -> addBullet(player, bullet, player.getView().getTranslateX() + (Player.PLAYER_WIDTH / 2 - 5) + x, player.getView().getTranslateY() + (Player.PLAYER_HEIGHT / 2) + y));
         //powyższa linijka to pozycja statku + jego połowa wymiatu, żeby mieć punkt środka pojazdu + odpowiedni x i y aby pocisk strzelał z przodu a nie ze środka
     }
 
@@ -111,36 +110,20 @@ public class Main extends Application {
         defaultGraphicContext();
         if (gameController.getPlayer1().getBullets().size() != 0 || gameController.getPlayer2().getBullets().size() != 0) {
             for (GameObject bullet : gameController.getPlayer1().getBullets()) {
-                    drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY(), bullet);
+                drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY(), bullet);
             }
             for (GameObject bullet : gameController.getPlayer2().getBullets()) {
                 drawParticles(bullet.getView().getTranslateX(), bullet.getView().getTranslateY(), bullet);
             }
         }
-        for(GameObject diedBullet : gameController.getPlayer1().getDiedBullets()){
-            drawDiedParticles(diedBullet.getView().getTranslateX(), diedBullet.getView().getTranslateY(), diedBullet);
+        for (GameObject diedBullet : gameController.getPlayer1().getDiedBullets()) {
+            drawDiedParticles(diedBullet);
         }
-        for(GameObject diedBullet : gameController.getPlayer2().getDiedBullets()){
-            drawDiedParticles(diedBullet.getView().getTranslateX(), diedBullet.getView().getTranslateY(), diedBullet);
+        for (GameObject diedBullet : gameController.getPlayer2().getDiedBullets()) {
+            drawDiedParticles(diedBullet);
         }
-//        else {
-//
-//            for (int i = 0; i < particles.size(); i++) {
-//                Particle p = particles.get(i);
-//
-//                    p.update();
-//
-//                    if (!p.isAlive()) {
-//                        particles.remove(i);
-//                        continue;
-//                    }
-//                    p.render(g);
-//
-//            }
-//        }
 
-        changeCurrentVelocity();
-
+        gameController.changePlayersCurrentVelocity();
         //
         gameController.updateGravity();
         root.getChildren().removeAll(gameController.gameObjectsToRemoveList());
@@ -159,6 +142,7 @@ public class Main extends Application {
         if (Math.random() < 0.02) {
             addEnemy(new Enemy(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
         }
+        gameController.isEndGame();
 
 
     }
@@ -172,7 +156,7 @@ public class Main extends Application {
 
         for (int i = 0; i < particles.size(); i++) {
             Particle p = particles.get(i);
-            if(p.getEmitter() == bullet) {
+            if (p.getEmitter() == bullet) {
                 p.update();
 
                 if (!p.isAlive()) {
@@ -184,7 +168,8 @@ public class Main extends Application {
         }
 
     }
-    private void drawDiedParticles(double x, double y, GameObject diedBullet) {
+
+    private void drawDiedParticles(GameObject diedBullet) {
 
         for (int i = 0; i < particles.size(); i++) {
             Particle p = particles.get(i);
@@ -197,39 +182,6 @@ public class Main extends Application {
                 }
                 p.render(g);
             }
-        }
-    }
-
-    private void changeCurrentVelocity() {
-        double currentVelocityX = 0;
-        double currentVelocityY = 0;
-        if(!gameController.getPlayer1().isOnGround()) {
-            currentVelocityX = gameController.getPlayer1().getVelocity().getX();
-            currentVelocityY = gameController.getPlayer1().getVelocity().getY();
-            for (int i = 0; i < gameController.getPlayer1().getMultipleMotions().size(); i++) {
-                currentVelocityX += gameController.getPlayer1().getMultipleMotions().get(i).getX();
-                currentVelocityY += gameController.getPlayer1().getMultipleMotions().get(i).getY();
-            }
-            currentVelocityY += gameController.getPlayer1().getGravityFactor() * 0.7 * Gravity.GRAVITY;
-            if (gameController.getPlayer1().getView().getRotate() == -90 || gameController.getPlayer1().getView().getRotate() == -270
-                    || gameController.getPlayer1().getView().getRotate() == 90 || gameController.getPlayer1().getView().getRotate() == 270) {
-                currentVelocityX = 0;
-            }
-            gameController.getPlayer1().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
-        }
-        if(!gameController.getPlayer2().isOnGround()) {
-            currentVelocityX = gameController.getPlayer2().getVelocity().getX();
-            currentVelocityY = gameController.getPlayer2().getVelocity().getY();
-            for (int i = 0; i < gameController.getPlayer2().getMultipleMotions().size(); i++) {
-                currentVelocityX += gameController.getPlayer2().getMultipleMotions().get(i).getX();
-                currentVelocityY += gameController.getPlayer2().getMultipleMotions().get(i).getY();
-            }
-            currentVelocityY += gameController.getPlayer2().getGravityFactor()*0.7 * Gravity.GRAVITY;
-            if (gameController.getPlayer2().getView().getRotate() == -90 || gameController.getPlayer2().getView().getRotate() == -270
-                    || gameController.getPlayer2().getView().getRotate() == 90 || gameController.getPlayer2().getView().getRotate() == 270) {
-                currentVelocityX = 0;
-            }
-            gameController.getPlayer2().setCurrentVelocity(new Point2D(currentVelocityX, currentVelocityY));
         }
     }
 
@@ -246,42 +198,42 @@ public class Main extends Application {
     private void onKeyPressed(KeyCode key) {
         switch (key) {
             case LEFT:
-                if(gameController.getPlayer1().isAlive()) {
+                if (gameController.getPlayer1().isAlive()) {
                     gameController.getPlayer1().setTurningLeft(true);
                 }
                 break;
             case RIGHT:
-                if(gameController.getPlayer1().isAlive()) {
+                if (gameController.getPlayer1().isAlive()) {
                     gameController.getPlayer1().setTurningRight(true);
                 }
                 break;
             case ENTER:
-                if(gameController.getPlayer1().isAlive()) {
+                if (gameController.getPlayer1().isAlive()) {
                     gameController.getPlayer1().setShooting(true);
                 }
                 break;
             case UP:
-                if(gameController.getPlayer1().isAlive()) {
+                if (gameController.getPlayer1().isAlive()) {
                     gameController.getPlayer1().setAccelerating(true);
                 }
                 break;
             case A:
-                if(gameController.getPlayer2().isAlive()) {
+                if (gameController.getPlayer2().isAlive()) {
                     gameController.getPlayer2().setTurningLeft(true);
                 }
                 break;
             case D:
-                if(gameController.getPlayer2().isAlive()) {
+                if (gameController.getPlayer2().isAlive()) {
                     gameController.getPlayer2().setTurningRight(true);
                 }
                 break;
             case TAB:
-                if(gameController.getPlayer2().isAlive()) {
+                if (gameController.getPlayer2().isAlive()) {
                     gameController.getPlayer2().setShooting(true);
                 }
                 break;
             case W:
-                if(gameController.getPlayer2().isAlive()) {
+                if (gameController.getPlayer2().isAlive()) {
                     gameController.getPlayer2().setAccelerating(true);
                 }
                 break;

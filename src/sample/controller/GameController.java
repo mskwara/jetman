@@ -3,33 +3,63 @@ package sample.controller;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import sample.Main;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import sample.objects.*;
 import sample.utils.Helper;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static sample.objects.Player.PLAYER_HEIGHT;
 import static sample.objects.Player.PLAYER_SPEED_FACTOR;
-import static sample.objects.Player.PLAYER_WIDTH;
 
 public class GameController {
     private List<GameObject> enemies = new ArrayList<>();
     private List<Airport> airports = new ArrayList<>();
     private static List<GameObject> pixels = new ArrayList<>();
 
+
     private Player player1;
     private Player player2;
     private Airport airport;
+    private Text player1Label;
+    private Text player2Label;
+    private Text endGameLabel;
+
 
     public GameController() {
-        player1 = new Player(Color.BLUE);
-        player2 = new Player(Color.YELLOW);
+        player1 = new Player("Michal", Color.BLUE, 455, 320);
+        player2 = new Player("Kuba", Color.YELLOW, 400, 320);
         airport = new Airport();
+        player1Label = new Text();
+        player2Label = new Text();
+        endGameLabel = new Text();
+        setLabel(player1Label, 20, 500, 50, Color.WHITE, true);
+        setLabel(player2Label, 20, 50, 50, Color.WHITE, true);
+        setLabel(endGameLabel, 50, 320, 300, Color.RED, false);
+    }
+
+    private void setLabel(Text label, int size, double x, double y, Color color, boolean visible) {
+        label.setFont(Font.font("Verdana", size));
+        label.setX(x);
+        label.setY(y);
+        label.setFill(color);
+        label.setText("");
+        label.setVisible(visible);
+    }
+
+    public Text getEndGameLabel() {
+        return endGameLabel;
+    }
+
+    public Text getPlayer1Label() {
+        return player1Label;
+    }
+
+    public Text getPlayer2Label() {
+        return player2Label;
     }
 
     public static List<GameObject> getPixels() {
@@ -68,7 +98,7 @@ public class GameController {
         //System.out.println("currentVel: " + player.getCurrentVelocity());
         if (airport.canPlayerLanding(player)) {
             player.setVelocity(0, 0);
-            player.setCurrentVelocity(new Point2D(0,0));
+            player.setCurrentVelocity(new Point2D(0, 0));
             player.setMultipleMotions(Collections.emptyList());
             player.getView().setRotate(-90);
             player.setOnGround(true);
@@ -94,6 +124,8 @@ public class GameController {
         player1.getDiedBullets().addAll(Collision.getObjectsOutOfMap(player1.getBullets()));
         player2.getDiedBullets().addAll(Collision.getObjectsOutOfMap(player2.getBullets()));
 
+        Collision.getPlayersOutOfMap(Arrays.asList(player1, player2));
+
         //enemy wypada za mapę
         list.addAll(Helper.gameObjectList2NodeList(Collision.getObjectsOutOfMap(enemies)));
 
@@ -105,8 +137,8 @@ public class GameController {
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsHitAirport(player2, airports)));
 
         //player uderza w lotnisko
-        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player1, airports)));
-        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player2, airports)));
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player1, player2, airports)));
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player2, player1, airports)));
 
         //usuwa niepotrzebne pixele
         list.addAll(Helper.gameObjectList2NodeList(Collision.removePixels()));
@@ -128,7 +160,27 @@ public class GameController {
         pixels.forEach(GameObject::update);
         updatePlayer(player1);
         updatePlayer(player2);
+        updateLabels();
         //updateEnemies();
+    }
+
+    public boolean isEndGame() {
+        return playerWins(player1) || playerWins(player2);
+    }
+
+    private boolean playerWins(Player player) {
+        if (player.getScore() > Score.WIN_SCORE) {
+            endGameLabel.setText(player.getName() + " wins!");
+            endGameLabel.setVisible(true);
+            return true;
+        }
+        return false;
+    }
+
+    private void updateLabels() {
+        player1Label.setText(player1.getScoreLabel());
+        player2Label.setText(player2.getScoreLabel());
+
     }
 
     private void updatePlayer(Player player) {
@@ -179,5 +231,9 @@ public class GameController {
         Gravity.updatePlayersGravity(Collections.singletonList(player2));
     }
 
+    public void changePlayersCurrentVelocity() {
+        player1.changeCurrentVelocity();
+        player2.changeCurrentVelocity();
+    }
 
 }
