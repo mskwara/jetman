@@ -4,12 +4,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 
-class Pixel extends GameObject {
+public class Pixel extends GameObject {
     private static final double MAX_GRAVITY_FACTOR = 15;
-    private static final int PIXEL_RADIUS = 2;
 
-    Pixel(Color color) {
-        super(new Circle(1, 1, PIXEL_RADIUS, color));
+    public boolean isGravityWorking() {
+        return isGravityWorking;
+    }
+
+    public void setGravityWorking(boolean gravityWorking) {
+        isGravityWorking = gravityWorking;
+    }
+
+    private boolean isGravityWorking = true;
+
+    public Pixel(Color color, int radius) {
+        super(new Circle(1, 1, radius, color));
         setMaxGravityFactor(MAX_GRAVITY_FACTOR);
     }
 }

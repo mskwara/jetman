@@ -5,9 +5,14 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import sample.Main;
 import sample.objects.*;
 import sample.utils.Helper;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +24,7 @@ public class GameController {
     private List<GameObject> enemies = new ArrayList<>();
     private List<Airport> airports = new ArrayList<>();
     private static List<GameObject> pixels = new ArrayList<>();
-
+    private List<Pixel> mapPixelList = new ArrayList<>();
 
     private Player player1;
     private Player player2;
@@ -27,6 +32,34 @@ public class GameController {
     private Text player1Label;
     private Text player2Label;
     private Text endGameLabel;
+
+    public void createMapPixels(String src){
+        BufferedImage mapImage = null;
+        try {
+            mapImage = ImageIO.read(new File(src));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for(int i = 0; i < mapImage.getWidth() ; i=i+3){
+            for(int j = 0; j < mapImage.getHeight() ; j=j+3){
+                int color = mapImage.getRGB(i, j);
+                int red   = (color >> 16) & 0xFF;
+                int green = (color >> 8)  & 0xFF;
+                int blue  = (color >> 0)  & 0xFF;
+
+
+                if(red == 0 && green == 255 && blue == 0){
+                    Pixel pixel = new Pixel(Color.GREEN, 3);
+                    //System.out.println(red+" "+green+" "+blue);
+                    pixel.setGravityWorking(false);
+                    pixel.setVelocity(0,0);
+                    mapPixelList.add(pixel);
+                    Main.addGameObject(pixel, i, j);
+                }
+            }
+        }
+
+    }
 
 
     public GameController() {
@@ -132,6 +165,9 @@ public class GameController {
         //pixel wypada za mapę
         list.addAll(Helper.gameObjectList2NodeList(Collision.getObjectsOutOfMap(pixels)));
 
+        //pixel mapowy wypada za mapę
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getPixelsOutOfMap(mapPixelList)));
+
         //bullet uderza w lotnisko
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsHitAirport(player1, airports)));
         list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsHitAirport(player2, airports)));
@@ -139,6 +175,13 @@ public class GameController {
         //player uderza w lotnisko
         list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player1, player2, airports)));
         list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitAirport(player2, player1, airports)));
+
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitWall(player1, player2, mapPixelList)));
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getPlayerHitWall(player2, player1, mapPixelList)));
+
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsMapCollisions(player1, mapPixelList)));
+        list.addAll(Helper.gameObjectList2NodeList(Collision.getBulletsMapCollisions(player2, mapPixelList)));
+
 
         //usuwa niepotrzebne pixele
         list.addAll(Helper.gameObjectList2NodeList(Collision.removePixels()));
@@ -148,6 +191,7 @@ public class GameController {
 
         enemies.removeIf(GameObject::isDead);
         pixels.removeIf(GameObject::isDead);
+        mapPixelList.removeIf(GameObject::isDead);
 
         return list;
     }
@@ -158,6 +202,11 @@ public class GameController {
         player2.getBullets().forEach(GameObject::update);
         enemies.forEach(GameObject::update);
         pixels.forEach(GameObject::update);
+        for(Pixel p : mapPixelList){
+            if(p.getVelocity().getX() != 0){
+                p.update();
+            }
+        }
         updatePlayer(player1);
         updatePlayer(player2);
         updateLabels();
@@ -232,6 +281,13 @@ public class GameController {
         Gravity.updateGameObjectsGravity(player2.getBullets());
         Gravity.updateGameObjectsGravity(enemies);
         Gravity.updateGameObjectsGravity(pixels);
+        int i = 0;
+        for(Pixel pixel : mapPixelList) {
+            if(pixel.isGravityWorking()) {
+                Gravity.updateGameObjectsGravity(Collections.singletonList(mapPixelList.get(i)));
+            }
+            i++;
+        }
         Gravity.updatePlayersGravity(Collections.singletonList(player1));
         Gravity.updatePlayersGravity(Collections.singletonList(player2));
     }
