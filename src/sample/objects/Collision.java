@@ -3,6 +3,7 @@ package sample.objects;
 import javafx.geometry.Point2D;
 import sample.Main;
 import sample.controller.GameController;
+import sun.plugin2.message.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +30,21 @@ public class Collision {
 
 
                 if (tempObj.isColliding(player) && pixelCount < 80) {
-                    Pixel pixel = new Pixel(player.getColor());
-                    pixel.setVelocity(new Point2D(velocity.getX() + Math.random() * 3, velocity.getY() + Math.random() * 3).normalize().multiply(multiplyingFactor));
+                    Pixel pixel = new Pixel(player.getColor(), 2);
+                    double randomX=0, randomY=0;
+                    if(velocity.getX()>=0){
+                        randomX = Math.random() * 3;
+                    }
+                    if(velocity.getX()<0){
+                        randomX = Math.random() * -3;
+                    }
+                    if(velocity.getY()>=0){
+                        randomY = Math.random() * 3;
+                    }
+                    if(velocity.getY()<0){
+                        randomY = Math.random() * -3;
+                    }
+                    pixel.setVelocity(new Point2D(velocity.getX() + randomX, velocity.getY() + randomY).multiply(multiplyingFactor));
                     GameController.getPixels().add(pixel);
                     Main.addGameObject(pixel, i, j);
                     pixelCount++;
@@ -48,6 +62,15 @@ public class Collision {
 
 
     public static List<GameObject> getObjectsOutOfMap(List<GameObject> objects) {
+        return objects.stream()
+                .filter(Collision::isObjectOutOfMap)
+                .peek(object -> {
+                    object.setAlive(false);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public static List<GameObject> getPixelsOutOfMap(List<Pixel> objects) {
         return objects.stream()
                 .filter(Collision::isObjectOutOfMap)
                 .peek(object -> {
@@ -78,7 +101,44 @@ public class Collision {
                     list.add(bullet);
                     list.add(enemy);
                     player.getDiedBullets().add(bullet);
-                    player.addScroe(Score.HIT_ENEMY_SCORE);
+                    player.addScore(Score.HIT_ENEMY_SCORE);
+                }
+            }
+        }
+        return list;
+    }
+
+    public static List<GameObject> getBulletsMapCollisions(Player player, List<Pixel> pixelsMapList) {
+        List<GameObject> list = new ArrayList<>();
+        for (GameObject bullet : player.getBullets()) {
+            for (Pixel mapPixel : pixelsMapList) {
+                if (bullet.isColliding(mapPixel)) {
+                    if (!mapPixel.isGravityWorking()) {
+                        bullet.setAlive(false);
+                        list.add(bullet);
+                        boolean hasDied = false;
+                        for (GameObject b : player.getDiedBullets()) {
+                            if (b.equals(bullet)) {
+                                hasDied = true;
+                            }
+                        }
+                        if (!hasDied) {
+                            player.getDiedBullets().add(bullet);
+                        }
+                        mapPixel.setGravityWorking(true);
+                        mapPixel.setVelocity(Math.random(), 0);
+
+                        for(Pixel p : pixelsMapList){
+                            double distance = Math.hypot(mapPixel.getView().getTranslateX()-p.getView().getTranslateX(), mapPixel.getView().getTranslateY()-p.getView().getTranslateY());
+                            if(p.getView().getTranslateX() >= mapPixel.getView().getTranslateX()-20 && p.getView().getTranslateX() <= mapPixel.getView().getTranslateX()+20
+                                    && p.getView().getTranslateY() >= mapPixel.getView().getTranslateY()-20 && p.getView().getTranslateY() <= mapPixel.getView().getTranslateY()+20
+                                    && distance <=20){
+                                p.setGravityWorking(true);
+                                p.setVelocity(Math.random(), 0);
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -106,8 +166,21 @@ public class Collision {
                 System.out.println("tutaj: " + player.getCurrentVelocity());
 //                player.setAlive(false);
 //                list.add(player);
-                otherPlayer.addScroe(Score.HIT_PLAYER_SCORE);
+                otherPlayer.addScore(Score.HIT_PLAYER_SCORE);
                 destroyPlayerWithCrashSpeed(player, new Point2D(player.getCurrentVelocity().getX(), player.getCurrentVelocity().getY()), 0.8);
+                player.respawn();
+            }
+        }
+        return list;
+    }
+    public static List<GameObject> getPlayerHitWall(Player player, Player otherPlayer, List<Pixel> mapPixelsList) {
+        List<GameObject> list = new ArrayList<>();
+        for (Pixel pixel : mapPixelsList) {
+            if (player.isColliding(pixel)) {
+//                player.setAlive(false);
+//                list.add(player);
+                otherPlayer.addScore(Score.HIT_PLAYER_SCORE);
+                destroyPlayerWithCrashSpeed(player, new Point2D(player.getCurrentVelocity().getX(), player.getCurrentVelocity().getY()), 0.3);
                 player.respawn();
             }
         }
@@ -140,7 +213,7 @@ public class Collision {
             player.changeHealth(-Gun.DAMAGES);
             if (player.getHealth() < 0) {
                 destroyPlayerWithCrashSpeed(player, new Point2D(bullet.getVelocity().getX() / 2, bullet.getVelocity().getY() / 2), 5);
-                shootingPlayer.addScroe(Score.HIT_PLAYER_SCORE);
+                shootingPlayer.addScore(Score.HIT_PLAYER_SCORE);
                 player.respawn();
             }
             player.getDiedBullets().add(bullet);

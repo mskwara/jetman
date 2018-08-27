@@ -72,7 +72,7 @@ public class Player extends GameObject {
         this.score = score;
     }
 
-    public void addScroe(int amount) {
+    public void addScore(int amount) {
         this.score += amount;
     }
 

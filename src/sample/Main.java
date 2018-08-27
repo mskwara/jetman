@@ -43,6 +43,8 @@ public class Main extends Application {
         defaultGraphicContext();
 
         gameController = new GameController();
+
+        gameController.createMapPixels("map.bmp");
         addGameObject(gameController.getPlayer1(), 455, 320);
         addGameObject(gameController.getPlayer2(), 400, 320);
         root.getChildren().add(gameController.getPlayer1Label());
